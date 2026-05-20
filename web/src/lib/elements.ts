@@ -91,6 +91,8 @@ export const ELEMENT_CATALOG: ElementSpec[] = [
   // Network
   { id: 'network-status', category: 'network', icon: '', sample: 'up', prompt: true },
   { id: 'vpn-status',     category: 'network', icon: '', sample: 'home', prompt: true },
+  { id: 'internal-ip',    category: 'network', icon: '', sample: '192.168.1.42', prompt: true },
+  { id: 'external-ip',    category: 'network', icon: '', sample: '203.0.113.7',  prompt: true },
 
   // aish-specific
   { id: 'ai-tier',         category: 'aish', icon: '', sample: 'AI:local', prompt: true },
