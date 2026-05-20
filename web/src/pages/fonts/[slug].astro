@@ -1,0 +1,97 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { loadFonts, fontFaceCss } from '../../lib/fonts';
+
+export function getStaticPaths() {
+  return loadFonts().map((f) => ({ params: { slug: f.id }, props: { font: f } }));
+}
+
+const { font } = Astro.props;
+const css = fontFaceCss(font);
+
+const sampleProse = `The quick brown fox jumps over the lazy dog.\n0123456789  !@#$%^&*()  <>?=+-_~\nThe→quick·brown·fox = (lazy: dog) ?? jumps`;
+const sampleCode = `function fib(n: number): number {
+  if (n < 2) return n;
+  return fib(n - 1) + fib(n - 2);
+}
+
+// Powerline + git glyphs:    main 0   AI:local
+// Devicons:
+// Material:
+// FontAwesome:      `;
+---
+<Layout title={`${font.name} — Fonts — Theme Atoms`} description={font.description} section="fonts">
+  <p class="back"><a href="/fonts">← All fonts</a></p>
+
+  <header>
+    <p class="kicker">Nerd Font</p>
+    <h1 style={`font-family: ${JSON.stringify(font.family)}, ui-monospace, monospace`}>{font.family}</h1>
+    {font.description && <p class="lead">{font.description}</p>}
+    <p class="meta">
+      <code>{font.id}</code> · v{font.version} · {font.license} · {font.classification}
+    </p>
+  </header>
+
+  <section class="big-sample" style={`font-family: ${JSON.stringify(font.family)}, ui-monospace, monospace`}>
+    <div class="lo">Aa Bb Cc 0123456789</div>
+    <div class="md">aA Bb 123  &lt;= != =&gt; |0Ol1Il|</div>
+    <div class="hi">     </div>
+  </section>
+
+  <h2>Sample text</h2>
+  <div class="sample-block" style={`font-family: ${JSON.stringify(font.family)}, ui-monospace, monospace`}>{sampleProse}</div>
+
+  <h2>Sample code</h2>
+  <pre class="sample-block" style={`font-family: ${JSON.stringify(font.family)}, ui-monospace, monospace`}>{sampleCode}</pre>
+
+  <h2>Use in a theme</h2>
+  <p>Paste this into the <code>[font]</code> block of any theme TOML:</p>
+  <pre><code>{`[font]
+family = "${font.family}"
+fallback = [${font.fallbackStack.map((s) => `"${s}"`).join(', ') || '"monospace"'}]
+size = 13
+weight = 400
+nerd_font = true`}</code></pre>
+
+  <h2>Weights & styles</h2>
+  <ul class="kv">
+    <li><span>weights</span><code>{font.weights.join(', ')}</code></li>
+    <li><span>styles</span><code>{font.styles.join(', ')}</code></li>
+    <li><span>fallback stack</span><code>{font.fallbackStack.join(' → ')}</code></li>
+  </ul>
+
+  <h2>Download (self-hosted)</h2>
+  <ul class="downloads">
+    {font.cdn.regular && <li><a href={font.cdn.regular}>Regular</a></li>}
+    {font.cdn.italic && <li><a href={font.cdn.italic}>Italic</a></li>}
+    {font.cdn.bold && <li><a href={font.cdn.bold}>Bold</a></li>}
+    {font.cdn.boldItalic && <li><a href={font.cdn.boldItalic}>Bold Italic</a></li>}
+  </ul>
+  {font.source && <p class="meta">Upstream: <a href={font.source}>{font.source}</a></p>}
+
+  <style set:html={`<style>${css}</style>`}></style>
+  <style>
+    .back { margin: 0 0 16px; font-size: 13px; }
+    .back a { color: var(--text-tertiary); text-decoration: none; }
+    .back a:hover { color: var(--text-primary); }
+    .kicker { color: var(--text-tertiary); font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; margin: 0 0 4px; }
+    h1 { font-size: 48px; line-height: 1.1; }
+    .lead { color: var(--text-secondary); font-size: 17px; max-width: 700px; }
+    .meta { color: var(--text-tertiary); font-size: 13px; }
+
+    .big-sample { background: var(--surface); padding: 32px; border-radius: 12px; margin: 24px 0; }
+    .big-sample .lo { font-size: 48px; line-height: 1.2; }
+    .big-sample .md { font-size: 22px; line-height: 1.5; margin-top: 12px; color: var(--text-secondary); }
+    .big-sample .hi { font-size: 36px; margin-top: 12px; color: var(--text-primary); }
+
+    .sample-block { background: var(--surface); padding: 16px; border-radius: 8px; white-space: pre-wrap; font-size: 14px; line-height: 1.6; margin-bottom: 24px; }
+
+    ul.kv { list-style: none; padding: 0; margin: 0 0 24px; display: grid; gap: 4px; }
+    ul.kv li { display: grid; grid-template-columns: 160px 1fr; padding: 6px 10px; background: var(--surface); border-radius: 6px; font-size: 13px; }
+    ul.kv li span { color: var(--text-tertiary); }
+
+    ul.downloads { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+    ul.downloads li a { display: inline-block; padding: 8px 14px; background: var(--surface); border-radius: 6px; text-decoration: none; color: var(--text-primary); font-size: 13px; border: 1px solid var(--surface-elevated); }
+    ul.downloads li a:hover { border-color: var(--primary); }
+  </style>
+</Layout>
