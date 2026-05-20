@@ -174,7 +174,7 @@
         "nix-shell", "direnv-status",
         "node-version", "python-version", "go-version", "rust-version", "ruby-version", "java-version",
         "load-avg", "cpu-usage", "mem-usage", "disk-usage",
-        "network-status", "vpn-status",
+        "network-status", "vpn-status", "internal-ip", "external-ip",
         "os-icon", "prompt-newline"
       ],
       "description": "Element ID. Consumers map this to a renderer (data + glyph). Unknown elements MAY be skipped silently. See docs/elements.md for the full catalog and data contracts."

@@ -78,6 +78,35 @@ Consumer normalizes the upstream condition into one of these buckets.
 | Cache TTL | n/a |
 | Hidden when | drachma is not configured |
 
+### `internal-ip`
+
+| | |
+|---|---|
+| Default rendering | ` 192.168.1.42` (Nerd Font) / `ip 192.168.1.42` (ASCII) |
+| Source | OS network APIs. First non-loopback IPv4 on the primary outbound interface. macOS: `ifconfig` / `route get default`. Linux: `ip route get 1.1.1.1` + `ip addr`. Windows: `Get-NetIPAddress`. |
+| Cache TTL | 60 seconds (interfaces change rarely; rescan covers VPN flips + dock/undock) |
+| Failure | Hide the element when no non-loopback IPv4 is reachable (airplane mode, etc.) |
+| Configurability | Interface selector (default: primary outbound); show IPv6 toggle (default: off) |
+
+No external fetch. This is local-only.
+
+### `external-ip`
+
+| | |
+|---|---|
+| Default rendering | ` 203.0.113.7` (Nerd Font) / `wan 203.0.113.7` (ASCII) |
+| Source | HTTP GET to a public IP echo. Default endpoint: `https://ifconfig.me`. Other supported: `https://api.ipify.org`, `https://ifconfig.co`, `https://icanhazip.com`. Use the `text/plain` response body (no JSON parsing needed for the defaults). |
+| Cache TTL | **10 minutes** (it's a public IP — only changes on ISP reassignment, VPN connect/disconnect, mobile hotspot toggles) |
+| Failure | Hide the element (offline, captive portal, rate-limited). Do NOT block the prompt. |
+| Configurability | Endpoint URL (default: `https://ifconfig.me`), force-refresh on VPN-status change (default: on) |
+| Privacy | Shows your **public IP** — opt-in only. Some users will not want this visible in screenshots. Recommend defaulting OFF in seed themes and documenting in the theme description when enabled. |
+
+Reference implementation (curl-equivalent in any language):
+
+```sh
+curl -fsS --max-time 3 https://ifconfig.me
+```
+
 ### `ai-suggestion`
 
 | | |
