@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import type { Theme, FontSpec, HorizontalBar, ElementsMap, ElementStyle } from '../lib/themes';
+import type { Theme, FontSpec, HorizontalBar, VerticalBar, ElementsMap, ElementStyle } from '../lib/themes';
 import TerminalPreview from './TerminalPreview';
 import { ELEMENT_CATALOG, CATEGORY_LABEL, PROMPT_ALLOWED_IDS, ALL_ELEMENT_IDS, type ElementCategory } from '../lib/elements';
 import { GLYPH_GROUPS } from '../lib/glyphs';
@@ -65,6 +65,15 @@ function emitToml(t: Theme): string {
     for (const [k, v] of Object.entries(t.syntax)) s += `${k} = "${v}"\n`;
   }
 
+  const emitElements = (dir: string, elements?: ElementsMap) => {
+    if (!elements || !Object.keys(elements).length) return;
+    for (const [elId, style] of Object.entries(elements)) {
+      if (!style || (style.icon == null && !style.color)) continue;
+      s += `\n[layout.${dir}.elements."${elId}"]\n`;
+      if (style.icon !== undefined) s += `icon = ${JSON.stringify(style.icon)}\n`;
+      if (style.color) s += `color = "${style.color}"\n`;
+    }
+  };
   const emitHBar = (dir: 'north' | 'south', b: HorizontalBar) => {
     s += `\n[layout.${dir}]\n`;
     s += `enabled = true\n`;
@@ -73,19 +82,25 @@ function emitToml(t: Theme): string {
     s += `left = [${(b.left ?? []).map((x) => `"${x}"`).join(', ')}]\n`;
     s += `center = [${(b.center ?? []).map((x) => `"${x}"`).join(', ')}]\n`;
     s += `right = [${(b.right ?? []).map((x) => `"${x}"`).join(', ')}]\n`;
-    if (b.elements && Object.keys(b.elements).length) {
-      for (const [elId, style] of Object.entries(b.elements)) {
-        if (!style || (style.icon == null && !style.color)) continue;
-        s += `\n[layout.${dir}.elements."${elId}"]\n`;
-        if (style.icon !== undefined) s += `icon = ${JSON.stringify(style.icon)}\n`;
-        if (style.color) s += `color = "${style.color}"\n`;
-      }
-    }
+    emitElements(dir, b.elements);
+  };
+  const emitVBar = (dir: 'east' | 'west', b: VerticalBar) => {
+    s += `\n[layout.${dir}]\n`;
+    s += `enabled = true\n`;
+    if (b.background) s += `background = "${b.background}"\n`;
+    if (b.foreground) s += `foreground = "${b.foreground}"\n`;
+    if (b.width != null) s += `width = ${b.width}\n`;
+    s += `top = [${(b.top ?? []).map((x) => `"${x}"`).join(', ')}]\n`;
+    s += `center = [${(b.center ?? []).map((x) => `"${x}"`).join(', ')}]\n`;
+    s += `bottom = [${(b.bottom ?? []).map((x) => `"${x}"`).join(', ')}]\n`;
+    emitElements(dir, b.elements);
   };
 
   if (t.layout) {
     if (t.layout.north?.enabled) emitHBar('north', t.layout.north);
     if (t.layout.south?.enabled) emitHBar('south', t.layout.south);
+    if (t.layout.east?.enabled) emitVBar('east', t.layout.east);
+    if (t.layout.west?.enabled) emitVBar('west', t.layout.west);
   }
   return s;
 }
@@ -251,6 +266,24 @@ export default function Builder({ seedThemes, fontFamilies = [] }: BuilderProps)
   const [southRight, setSouthRight] = useState<string[]>(seed.layout?.south?.right ?? []);
   const [southElements, setSouthElements] = useState<ElementsMap>(seed.layout?.south?.elements ?? {});
 
+  const [eastEnabled, setEastEnabled] = useState(seed.layout?.east?.enabled ?? false);
+  const [eastBg, setEastBg] = useState(seed.layout?.east?.background ?? '');
+  const [eastFg, setEastFg] = useState(seed.layout?.east?.foreground ?? '');
+  const [eastWidth, setEastWidth] = useState<number | undefined>(seed.layout?.east?.width);
+  const [eastTop, setEastTop] = useState<string[]>(seed.layout?.east?.top ?? []);
+  const [eastCenter, setEastCenter] = useState<string[]>(seed.layout?.east?.center ?? []);
+  const [eastBottom, setEastBottom] = useState<string[]>(seed.layout?.east?.bottom ?? []);
+  const [eastElements, setEastElements] = useState<ElementsMap>(seed.layout?.east?.elements ?? {});
+
+  const [westEnabled, setWestEnabled] = useState(seed.layout?.west?.enabled ?? false);
+  const [westBg, setWestBg] = useState(seed.layout?.west?.background ?? '');
+  const [westFg, setWestFg] = useState(seed.layout?.west?.foreground ?? '');
+  const [westWidth, setWestWidth] = useState<number | undefined>(seed.layout?.west?.width);
+  const [westTop, setWestTop] = useState<string[]>(seed.layout?.west?.top ?? []);
+  const [westCenter, setWestCenter] = useState<string[]>(seed.layout?.west?.center ?? []);
+  const [westBottom, setWestBottom] = useState<string[]>(seed.layout?.west?.bottom ?? []);
+  const [westElements, setWestElements] = useState<ElementsMap>(seed.layout?.west?.elements ?? {});
+
   const id = slugify(displayName);
 
   const font: FontSpec | undefined = fontFamily ? {
@@ -275,8 +308,26 @@ export default function Builder({ seedThemes, fontFamilies = [] }: BuilderProps)
     left: southLeft, center: [], right: southRight,
     ...(Object.keys(southElements).length ? { elements: southElements } : {}),
   } : undefined;
+  const east: VerticalBar | undefined = eastEnabled ? {
+    enabled: true,
+    ...(eastBg ? { background: eastBg } : {}),
+    ...(eastFg ? { foreground: eastFg } : {}),
+    ...(eastWidth != null ? { width: eastWidth } : {}),
+    top: eastTop, center: eastCenter, bottom: eastBottom,
+    ...(Object.keys(eastElements).length ? { elements: eastElements } : {}),
+  } : undefined;
+  const west: VerticalBar | undefined = westEnabled ? {
+    enabled: true,
+    ...(westBg ? { background: westBg } : {}),
+    ...(westFg ? { foreground: westFg } : {}),
+    ...(westWidth != null ? { width: westWidth } : {}),
+    top: westTop, center: westCenter, bottom: westBottom,
+    ...(Object.keys(westElements).length ? { elements: westElements } : {}),
+  } : undefined;
 
-  const layout = (north || south) ? { ...(north ? { north } : {}), ...(south ? { south } : {}) } : undefined;
+  const layout = (north || south || east || west)
+    ? { ...(north ? { north } : {}), ...(south ? { south } : {}), ...(east ? { east } : {}), ...(west ? { west } : {}) }
+    : undefined;
 
   const theme: Theme = {
     schema: 'https://theme-atoms.com/schemas/theme-v1.json',
@@ -315,6 +366,22 @@ export default function Builder({ seedThemes, fontFamilies = [] }: BuilderProps)
     setSouthLeft(seed.layout?.south?.left ?? []);
     setSouthRight(seed.layout?.south?.right ?? []);
     setSouthElements(seed.layout?.south?.elements ?? {});
+    setEastEnabled(seed.layout?.east?.enabled ?? false);
+    setEastBg(seed.layout?.east?.background ?? '');
+    setEastFg(seed.layout?.east?.foreground ?? '');
+    setEastWidth(seed.layout?.east?.width);
+    setEastTop(seed.layout?.east?.top ?? []);
+    setEastCenter(seed.layout?.east?.center ?? []);
+    setEastBottom(seed.layout?.east?.bottom ?? []);
+    setEastElements(seed.layout?.east?.elements ?? {});
+    setWestEnabled(seed.layout?.west?.enabled ?? false);
+    setWestBg(seed.layout?.west?.background ?? '');
+    setWestFg(seed.layout?.west?.foreground ?? '');
+    setWestWidth(seed.layout?.west?.width);
+    setWestTop(seed.layout?.west?.top ?? []);
+    setWestCenter(seed.layout?.west?.center ?? []);
+    setWestBottom(seed.layout?.west?.bottom ?? []);
+    setWestElements(seed.layout?.west?.elements ?? {});
   };
 
   const copyToml = () => { navigator.clipboard.writeText(toml); };
@@ -420,6 +487,46 @@ export default function Builder({ seedThemes, fontFamilies = [] }: BuilderProps)
                 <div className="ckwrap"><div className="seg-label">Right</div><CategorizedChips value={southRight} groups={BAR_GROUPS} onChange={setSouthRight} /></div>
                 <div className="ckwrap"><div className="seg-label">Element style overrides</div>
                   <ElementStyleEditor ids={[...new Set([...southLeft, ...southRight])]} style={southElements} onChange={setSouthElements} />
+                </div>
+              </>
+            )}
+          </section>
+
+          <section>
+            <h3>East bar (right sidebar)</h3>
+            <label className="cb"><input type="checkbox" checked={eastEnabled} onChange={(e) => setEastEnabled(e.target.checked)} /> Enabled</label>
+            {eastEnabled && (
+              <>
+                <div className="row2">
+                  <label>Background<input value={eastBg} placeholder="#hex or {palette.x}" onChange={(e) => setEastBg(e.target.value)} /></label>
+                  <label>Foreground<input value={eastFg} placeholder="#hex or {palette.x}" onChange={(e) => setEastFg(e.target.value)} /></label>
+                </div>
+                <label>Width (cells)<input type="number" min={4} max={80} value={eastWidth ?? ''} onChange={(e) => setEastWidth(e.target.value ? Number(e.target.value) : undefined)} placeholder="e.g. 24" /></label>
+                <div className="ckwrap"><div className="seg-label">Top</div><CategorizedChips value={eastTop} groups={BAR_GROUPS} onChange={setEastTop} /></div>
+                <div className="ckwrap"><div className="seg-label">Center</div><CategorizedChips value={eastCenter} groups={BAR_GROUPS} onChange={setEastCenter} /></div>
+                <div className="ckwrap"><div className="seg-label">Bottom</div><CategorizedChips value={eastBottom} groups={BAR_GROUPS} onChange={setEastBottom} /></div>
+                <div className="ckwrap"><div className="seg-label">Element style overrides</div>
+                  <ElementStyleEditor ids={[...new Set([...eastTop, ...eastCenter, ...eastBottom])]} style={eastElements} onChange={setEastElements} />
+                </div>
+              </>
+            )}
+          </section>
+
+          <section>
+            <h3>West bar (left sidebar)</h3>
+            <label className="cb"><input type="checkbox" checked={westEnabled} onChange={(e) => setWestEnabled(e.target.checked)} /> Enabled</label>
+            {westEnabled && (
+              <>
+                <div className="row2">
+                  <label>Background<input value={westBg} placeholder="#hex or {palette.x}" onChange={(e) => setWestBg(e.target.value)} /></label>
+                  <label>Foreground<input value={westFg} placeholder="#hex or {palette.x}" onChange={(e) => setWestFg(e.target.value)} /></label>
+                </div>
+                <label>Width (cells)<input type="number" min={4} max={80} value={westWidth ?? ''} onChange={(e) => setWestWidth(e.target.value ? Number(e.target.value) : undefined)} placeholder="e.g. 20" /></label>
+                <div className="ckwrap"><div className="seg-label">Top</div><CategorizedChips value={westTop} groups={BAR_GROUPS} onChange={setWestTop} /></div>
+                <div className="ckwrap"><div className="seg-label">Center</div><CategorizedChips value={westCenter} groups={BAR_GROUPS} onChange={setWestCenter} /></div>
+                <div className="ckwrap"><div className="seg-label">Bottom</div><CategorizedChips value={westBottom} groups={BAR_GROUPS} onChange={setWestBottom} /></div>
+                <div className="ckwrap"><div className="seg-label">Element style overrides</div>
+                  <ElementStyleEditor ids={[...new Set([...westTop, ...westCenter, ...westBottom])]} style={westElements} onChange={setWestElements} />
                 </div>
               </>
             )}

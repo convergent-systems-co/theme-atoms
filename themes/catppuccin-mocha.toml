@@ -1,0 +1,72 @@
+schema = "https://theme-atoms.com/schemas/theme-v1.json"
+
+[meta]
+id = "catppuccin-mocha"
+version = "1.0.0"
+display_name = "Catppuccin Mocha"
+description = "Warm pastel palette by the Catppuccin team — the darkest of the four flavors. Smooth, low-contrast, easy on the eyes. Powerline separator."
+extends_brand = "catppuccin"
+
+[font]
+family = "JetBrainsMono Nerd Font"
+fallback = ["JetBrains Mono", "Fira Code", "Menlo", "monospace"]
+nerd_font = true
+
+[palette]
+fg = "#cdd6f4"
+bg = "#1e1e2e"
+base = "#1e1e2e"
+mantle = "#181825"
+crust = "#11111b"
+surface0 = "#313244"
+surface1 = "#45475a"
+surface2 = "#585b70"
+muted = "#6c7086"
+overlay0 = "#6c7086"
+overlay1 = "#7f849c"
+overlay2 = "#9399b2"
+rosewater = "#f5e0dc"
+flamingo = "#f2cdcd"
+pink = "#f5c2e7"
+mauve = "#cba6f7"
+red = "#f38ba8"
+maroon = "#eba0ac"
+peach = "#fab387"
+yellow = "#f9e2af"
+green = "#a6e3a1"
+teal = "#94e2d5"
+sky = "#89dceb"
+sapphire = "#74c7ec"
+blue = "#89b4fa"
+lavender = "#b4befe"
+
+[prompt]
+character = "❯"
+character_color = "{palette.mauve}"
+segments = ["cwd", "git-status", "ai-tier", "exit-code"]
+separator = "powerline"
+glyphs = "nerd-default"
+
+[roles]
+ai_tier_local = "{palette.green}"
+ai_tier_cloud = "{palette.blue}"
+drachma_low = "{palette.red}"
+drachma_ok = "{palette.overlay0}"
+exit_ok = "{palette.overlay0}"
+exit_err = "{palette.red}"
+
+[syntax]
+keyword = "{palette.mauve}"
+string = "{palette.green}"
+number = "{palette.peach}"
+function = "{palette.blue}"
+type = "{palette.yellow}"
+comment = "{palette.overlay0}"
+
+[layout.north]
+enabled = true
+background = "{palette.mantle}"
+foreground = "{palette.fg}"
+left = ["session", "host"]
+center = []
+right = ["weather", "time"]
