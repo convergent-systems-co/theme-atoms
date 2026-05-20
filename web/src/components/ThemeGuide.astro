@@ -1,0 +1,147 @@
+---
+import type { Theme } from '../lib/themes';
+import { themeUrl, aishCommand, resolveColor } from '../lib/themes';
+import TerminalPreview from './TerminalPreview';
+
+export interface Props {
+  theme: Theme;
+  tomlSource: string;
+}
+
+const { theme, tomlSource } = Astro.props;
+const url = themeUrl(theme);
+const cmd = aishCommand(theme);
+const paletteEntries = Object.entries(theme.palette);
+---
+<section class="guide">
+  <header>
+    <p class="kicker">Theme</p>
+    <h1>{theme.meta.display_name}</h1>
+    <p class="lead">{theme.meta.description ?? 'Self-contained terminal theme.'}</p>
+    <p class="meta">
+      <code>{theme.meta.id}</code> · v{theme.meta.version}
+      {theme.meta.extends_brand && <> · extends <code>{theme.meta.extends_brand}</code></>}
+    </p>
+  </header>
+
+  <div class="preview-wrap">
+    <TerminalPreview theme={theme} client:load />
+  </div>
+
+  <div class="use">
+    <h2>Use in aish</h2>
+    <div class="cmds">
+      <div class="cmd">
+        <span class="label">Apply</span>
+        <button class="copy" data-copy={cmd}>
+          <code class="payload">{cmd}</code>
+          <span class="status" aria-hidden="true"></span>
+        </button>
+      </div>
+      <div class="cmd">
+        <span class="label">URL</span>
+        <button class="copy" data-copy={url}>
+          <code class="payload">{url}</code>
+          <span class="status" aria-hidden="true"></span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <h2>Palette</h2>
+  <div class="swatches">
+    {paletteEntries.map(([name, value]) => (
+      <div class="sw">
+        <span class="chip" style={`background:${value}`} aria-hidden="true"></span>
+        <span class="sw-name"><code>{name}</code></span>
+        <span class="sw-val"><code>{value}</code></span>
+      </div>
+    ))}
+  </div>
+
+  <h2>Prompt</h2>
+  <ul class="kv">
+    <li><span>character</span><code>{theme.prompt.character}</code></li>
+    <li><span>character_color</span><code>{theme.prompt.character_color}</code></li>
+    <li><span>segments</span><code>{(theme.prompt.segments ?? []).join(', ') || '(none)'}</code></li>
+    <li><span>separator</span><code>{theme.prompt.separator ?? 'none'}</code></li>
+    <li><span>glyphs</span><code>{theme.prompt.glyphs ?? 'ascii'}</code></li>
+  </ul>
+
+  {theme.roles && Object.keys(theme.roles).length > 0 && (
+    <>
+      <h2>Roles</h2>
+      <ul class="kv">
+        {Object.entries(theme.roles).map(([k, v]) => (
+          <li>
+            <span>{k}</span>
+            <span class="role-val">
+              <span class="chip-sm" style={`background:${resolveColor(v, theme.palette)}`}></span>
+              <code>{v}</code>
+            </span>
+          </li>
+        ))}
+      </ul>
+    </>
+  )}
+
+  {theme.syntax && Object.keys(theme.syntax).length > 0 && (
+    <>
+      <h2>Syntax</h2>
+      <ul class="kv">
+        {Object.entries(theme.syntax).map(([k, v]) => (
+          <li>
+            <span>{k}</span>
+            <span class="role-val">
+              <span class="chip-sm" style={`background:${resolveColor(v, theme.palette)}`}></span>
+              <code>{v}</code>
+            </span>
+          </li>
+        ))}
+      </ul>
+    </>
+  )}
+
+  <h2>theme.toml</h2>
+  <pre><code>{tomlSource}</code></pre>
+</section>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>('button.copy').forEach((b) => {
+    b.addEventListener('click', () => {
+      const text = b.getAttribute('data-copy') ?? '';
+      navigator.clipboard.writeText(text);
+      const status = b.querySelector<HTMLSpanElement>('.status');
+      if (!status) return;
+      status.textContent = '✓ copied';
+      setTimeout(() => { status.textContent = ''; }, 900);
+    });
+  });
+</script>
+
+<style>
+  .kicker { color: var(--text-tertiary); font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; margin: 0 0 4px; }
+  .lead { color: var(--text-secondary); font-size: 17px; max-width: 600px; }
+  .meta { color: var(--text-tertiary); font-size: 13px; }
+  .preview-wrap { margin: 24px 0 32px; max-width: 720px; }
+  .use { background: var(--surface); padding: 16px; border-radius: 10px; margin-bottom: 32px; }
+  .use h2 { margin: 0 0 12px; font-size: 16px; }
+  .cmds { display: flex; flex-direction: column; gap: 8px; }
+  .cmd { display: grid; grid-template-columns: 60px 1fr; align-items: center; gap: 12px; }
+  .cmd .label { color: var(--text-tertiary); font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; }
+  button.copy { background: var(--surface-elevated); border: 1px solid var(--surface); padding: 8px 12px; border-radius: 6px; cursor: pointer; text-align: left; color: var(--text-primary); display: flex; align-items: center; justify-content: space-between; gap: 12px; font: inherit; }
+  button.copy:hover { border-color: var(--primary); }
+  button.copy .payload { background: transparent; padding: 0; }
+  button.copy .status { color: var(--accent); font-size: 12px; font-family: var(--font-mono); min-width: 60px; text-align: right; }
+
+  .swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 8px; }
+  .sw { display: grid; grid-template-columns: 28px 1fr auto; align-items: center; gap: 10px; padding: 6px 10px; background: var(--surface); border-radius: 6px; font-size: 13px; }
+  .chip { display: block; width: 24px; height: 24px; border-radius: 4px; border: 1px solid rgba(0,0,0,0.12); }
+  .chip-sm { display: inline-block; width: 14px; height: 14px; border-radius: 3px; vertical-align: middle; margin-right: 6px; border: 1px solid rgba(0,0,0,0.12); }
+  .sw-val { color: var(--text-tertiary); font-size: 12px; }
+
+  ul.kv { list-style: none; padding: 0; margin: 0 0 24px; display: grid; gap: 4px; }
+  ul.kv li { display: grid; grid-template-columns: 200px 1fr; align-items: center; padding: 6px 10px; background: var(--surface); border-radius: 6px; font-size: 13px; }
+  ul.kv li span { color: var(--text-tertiary); }
+  .role-val { display: flex; align-items: center; }
+</style>
