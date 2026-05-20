@@ -1,0 +1,24 @@
+{
+  "schema_version": "1",
+  "generated_at": "static",
+  "themes": [
+    {
+      "id": "default",
+      "version": "1.0.0",
+      "display_name": "Default",
+      "url": "https://theme-atoms.com/themes/default.toml"
+    },
+    {
+      "id": "monokai",
+      "version": "1.0.0",
+      "display_name": "Monokai",
+      "url": "https://theme-atoms.com/themes/monokai.toml"
+    },
+    {
+      "id": "nord-powerline",
+      "version": "1.0.0",
+      "display_name": "Nord — Powerline",
+      "url": "https://theme-atoms.com/themes/nord-powerline.toml"
+    }
+  ]
+}
