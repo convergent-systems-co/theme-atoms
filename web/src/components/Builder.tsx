@@ -7,8 +7,8 @@ export interface BuilderProps {
   fontFamilies?: string[];
 }
 
-const SEGMENTS = ['cwd', 'git-status', 'ai-tier', 'drachma-balance', 'exit-code', 'duration', 'k8s-context', 'user', 'host', 'venv'];
-const BAR_ELEMENTS = [...SEGMENTS, 'session', 'time', 'ai-suggestion'];
+const SEGMENTS = ['cwd', 'git-status', 'ai-tier', 'drachma-balance', 'exit-code', 'duration', 'k8s-context', 'user', 'host', 'venv', 'weather', 'time', 'battery'];
+const BAR_ELEMENTS = [...SEGMENTS, 'session', 'ai-suggestion'];
 const SEPARATORS = ['powerline', 'minimal', 'classic', 'none'] as const;
 const GLYPHS = ['nerd-default', 'ascii', 'minimal'] as const;
 const WEIGHTS = [100, 200, 300, 400, 500, 600, 700, 800, 900] as const;
