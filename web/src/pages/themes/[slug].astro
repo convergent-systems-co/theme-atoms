@@ -1,0 +1,24 @@
+---
+import { readFileSync } from 'node:fs';
+import { join, resolve } from 'node:path';
+import Layout from '../../layouts/Layout.astro';
+import ThemeGuide from '../../components/ThemeGuide.astro';
+import { loadThemes } from '../../lib/themes';
+
+export function getStaticPaths() {
+  return loadThemes().map((t) => ({ params: { slug: t.meta.id }, props: { theme: t } }));
+}
+
+const { theme } = Astro.props;
+const repoRoot = resolve(process.cwd(), '..');
+const tomlSource = readFileSync(join(repoRoot, 'themes', `${theme.meta.id}.toml`), 'utf-8');
+---
+<Layout title={`${theme.meta.display_name} — Theme Atoms`} description={theme.meta.description} section="themes">
+  <p class="back"><a href="/themes">← All themes</a></p>
+  <ThemeGuide theme={theme} tomlSource={tomlSource} />
+  <style>
+    .back { margin: 0 0 16px; font-size: 13px; }
+    .back a { color: var(--text-tertiary); text-decoration: none; }
+    .back a:hover { color: var(--text-primary); }
+  </style>
+</Layout>

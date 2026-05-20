@@ -1,0 +1,47 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+<Layout title="Request a theme — Theme Atoms" section="request">
+  <header>
+    <p class="kicker">Contribute</p>
+    <h1>Request or propose a theme</h1>
+    <p class="lead">Every theme in the catalog landed as a PR. Yours can too — either start from the builder or hand us a description and we'll draft one.</p>
+  </header>
+
+  <div class="paths">
+    <div class="path">
+      <h2>1. You have the theme already</h2>
+      <p>Open a PR against <a href="https://github.com/convergent-systems-co/theme-atoms">convergent-systems-co/theme-atoms</a>: drop a file in <code>themes/&lt;id&gt;.toml</code>, add an entry to <code>themes/index.json</code>, run <code>python3 scripts/validate.py</code> locally to confirm. CI re-validates and Cloudflare Pages auto-deploys on merge — your theme is live at <code>theme-atoms.com/themes/&lt;id&gt;.toml</code> within a minute.</p>
+    </div>
+
+    <div class="path">
+      <h2>2. You want to design one interactively</h2>
+      <p>Open the <a href="/builder">builder</a>. Pick a seed, tune palette + prompt + segments + separator + glyphs, hit <strong>Propose on GitHub</strong>. We get a pre-filled issue with your TOML; we review, you iterate, we merge.</p>
+    </div>
+
+    <div class="path">
+      <h2>3. You just want to describe what you want</h2>
+      <p>File a free-form theme request — palette inspiration, vibe, references. We'll draft the TOML and tag you for review.</p>
+      <p><a class="btn primary" href="https://github.com/convergent-systems-co/theme-atoms/issues/new?labels=theme-request&template=&title=theme%3A+">File a theme request →</a></p>
+    </div>
+  </div>
+
+  <h2>Acceptance criteria</h2>
+  <ul>
+    <li>Validates against <a href="https://theme-atoms.com/schemas/theme-v1.json"><code>schemas/theme-v1.json</code></a></li>
+    <li>Palette is fully inlined (single-fetch contract — no <code>brand-atoms://</code> refs)</li>
+    <li>Internal color references resolve within the theme's own <code>[palette]</code></li>
+    <li>Visually distinct from existing themes</li>
+    <li><code>display_name</code> and <code>description</code> are present and intentional</li>
+  </ul>
+
+  <style>
+    .kicker { color: var(--text-tertiary); font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; margin: 0 0 4px; }
+    .lead { color: var(--text-secondary); max-width: 640px; }
+    .paths { display: grid; gap: 16px; margin: 24px 0; }
+    .path { background: var(--surface); padding: 20px; border-radius: 12px; }
+    .path h2 { margin-top: 0; font-size: 18px; }
+    .btn { display: inline-block; padding: 10px 18px; border-radius: 8px; text-decoration: none; font-weight: 500; font-size: 14px; }
+    .btn.primary { background: var(--primary); color: #000; }
+  </style>
+</Layout>
