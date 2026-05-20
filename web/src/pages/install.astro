@@ -1,0 +1,36 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+<Layout title="Install — Theme Atoms" section="install">
+  <header>
+    <p class="kicker">Install</p>
+    <h1>Install aish</h1>
+    <p class="lead">aish is the shell that consumes theme-atoms. Themes work in any aish v0.2+ install.</p>
+  </header>
+
+  <h2>Homebrew (macOS / Linux)</h2>
+  <pre><code>brew tap convergent-systems-co/tap
+brew install aish</code></pre>
+
+  <h2>Scoop (Windows)</h2>
+  <pre><code>scoop bucket add csco https://github.com/convergent-systems-co/scoop-bucket
+scoop install aish</code></pre>
+
+  <h2>From source</h2>
+  <pre><code>git clone https://github.com/convergent-systems-co/aish.git
+cd aish && go build ./cmd/aish</code></pre>
+
+  <h2>Verify</h2>
+  <pre><code>aish --version
+aish theme list</code></pre>
+  <p>If <code>theme list</code> shows at least <code>default</code>, you're ready.</p>
+
+  <h2>Then</h2>
+  <p><a href="/how-to-use">How to use →</a></p>
+
+  <style>
+    .kicker { color: var(--text-tertiary); font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; margin: 0 0 4px; }
+    .lead { color: var(--text-secondary); max-width: 640px; }
+    pre { max-width: 640px; }
+  </style>
+</Layout>

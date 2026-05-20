@@ -1,0 +1,45 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+<Layout title="How to use — Theme Atoms" section="how-to-use">
+  <header>
+    <p class="kicker">How to use</p>
+    <h1>aish + themes, day-to-day</h1>
+    <p class="lead">aish v0.2 caches themes locally and renders deterministically. Every command below is idempotent.</p>
+  </header>
+
+  <h2>List available themes</h2>
+  <pre><code>$ aish theme list
+* default
+  monokai
+  nord-powerline</code></pre>
+  <p>The <code>*</code> marks the active theme. Available themes are read from the index at <a href="https://theme-atoms.com/themes/index.json">theme-atoms.com/themes/index.json</a>.</p>
+
+  <h2>Switch theme</h2>
+  <pre><code>$ aish theme set nord-powerline
+theme: active = nord-powerline</code></pre>
+  <p>aish fetches <code>https://theme-atoms.com/themes/nord-powerline.toml</code>, validates against <code>theme-v1.json</code>, caches under <code>~/.cache/aish/themes/</code>, and applies. Persistent across sessions.</p>
+
+  <h2>Show the active theme</h2>
+  <pre><code>$ aish theme show
+nord-powerline (1.0.0) — Nord palette, powerline separator</code></pre>
+
+  <h2>Reset to default</h2>
+  <pre><code>$ aish theme set default</code></pre>
+
+  <h2>Use a custom URL (private/staging)</h2>
+  <pre><code>$ aish theme set --url https://example.com/my-team-theme.toml</code></pre>
+  <p>Any URL that returns a v1 theme TOML works. The schema is the contract.</p>
+
+  <h2>Offline mode</h2>
+  <p>If aish can't reach the network, the cached version of the active theme is used. Switching to a never-cached theme while offline errors clearly.</p>
+
+  <h2>Wrote your own?</h2>
+  <p>Propose it on the <a href="/builder">builder</a> or file a <a href="/request-theme">theme request</a>.</p>
+
+  <style>
+    .kicker { color: var(--text-tertiary); font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; margin: 0 0 4px; }
+    .lead { color: var(--text-secondary); max-width: 640px; }
+    pre { max-width: 640px; }
+  </style>
+</Layout>
