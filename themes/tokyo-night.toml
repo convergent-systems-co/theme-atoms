@@ -1,0 +1,61 @@
+schema = "https://theme-atoms.com/schemas/theme-v1.json"
+
+[meta]
+id = "tokyo-night"
+version = "1.0.0"
+display_name = "Tokyo Night"
+description = "Dark blue palette inspired by the lights of downtown Tokyo at night. Powerline separator, Nerd Font glyphs. Full segment chain."
+extends_brand = "tokyo-night"
+
+[font]
+family = "JetBrainsMono Nerd Font"
+fallback = ["JetBrains Mono", "Fira Code", "Menlo", "monospace"]
+size = 13
+weight = 400
+nerd_font = true
+
+[palette]
+fg = "#c0caf5"
+bg = "#1a1b26"
+storm = "#24283b"
+muted = "#565f89"
+black = "#15161e"
+blue = "#7aa2f7"
+cyan = "#7dcfff"
+green = "#9ece6a"
+magenta = "#bb9af7"
+orange = "#ff9e64"
+purple = "#9d7cd8"
+red = "#f7768e"
+yellow = "#e0af68"
+
+[prompt]
+character = "❯"
+character_color = "{palette.blue}"
+segments = ["cwd", "git-status", "ai-tier", "exit-code"]
+separator = "powerline"
+glyphs = "nerd-default"
+
+[roles]
+ai_tier_local = "{palette.green}"
+ai_tier_cloud = "{palette.blue}"
+drachma_low = "{palette.red}"
+drachma_ok = "{palette.muted}"
+exit_ok = "{palette.muted}"
+exit_err = "{palette.red}"
+
+[syntax]
+keyword = "{palette.magenta}"
+string = "{palette.green}"
+number = "{palette.orange}"
+function = "{palette.blue}"
+type = "{palette.cyan}"
+comment = "{palette.muted}"
+
+[layout.south]
+enabled = true
+background = "{palette.storm}"
+foreground = "{palette.muted}"
+left = ["cwd", "git-status"]
+center = []
+right = ["weather", "time", "battery"]

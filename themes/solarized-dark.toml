@@ -1,0 +1,50 @@
+schema = "https://theme-atoms.com/schemas/theme-v1.json"
+
+[meta]
+id = "solarized-dark"
+version = "1.0.0"
+display_name = "Solarized Dark"
+description = "Ethan Schoonover's calibrated palette — base03 background with sixteen carefully-tuned accents. Minimal separator."
+extends_brand = "solarized"
+
+[palette]
+fg = "#839496"
+bg = "#002b36"
+base03 = "#002b36"
+base02 = "#073642"
+base01 = "#586e75"
+base00 = "#657b83"
+base0 = "#839496"
+base1 = "#93a1a1"
+base2 = "#eee8d5"
+base3 = "#fdf6e3"
+muted = "#586e75"
+yellow = "#b58900"
+orange = "#cb4b16"
+red = "#dc322f"
+magenta = "#d33682"
+violet = "#6c71c4"
+blue = "#268bd2"
+cyan = "#2aa198"
+green = "#859900"
+
+[prompt]
+character = "❯"
+character_color = "{palette.cyan}"
+segments = ["cwd", "git-status", "exit-code"]
+separator = "minimal"
+glyphs = "ascii"
+
+[roles]
+ai_tier_local = "{palette.green}"
+ai_tier_cloud = "{palette.blue}"
+exit_ok = "{palette.muted}"
+exit_err = "{palette.red}"
+
+[syntax]
+keyword = "{palette.green}"
+string = "{palette.cyan}"
+number = "{palette.violet}"
+function = "{palette.blue}"
+type = "{palette.yellow}"
+comment = "{palette.muted}"

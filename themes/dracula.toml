@@ -1,0 +1,52 @@
+schema = "https://theme-atoms.com/schemas/theme-v1.json"
+
+[meta]
+id = "dracula"
+version = "1.0.0"
+display_name = "Dracula"
+description = "Classic Dracula palette — dark purple background, vivid magenta/cyan/green/yellow accents. Minimal separator, optional Nerd Font glyphs."
+extends_brand = "dracula"
+
+[font]
+family = "JetBrainsMono Nerd Font"
+fallback = ["JetBrains Mono", "Fira Code", "Menlo", "monospace"]
+size = 13
+weight = 400
+ligatures = true
+nerd_font = true
+
+[palette]
+fg = "#f8f8f2"
+bg = "#282a36"
+current = "#44475a"
+muted = "#6272a4"
+cyan = "#8be9fd"
+green = "#50fa7b"
+orange = "#ffb86c"
+pink = "#ff79c6"
+purple = "#bd93f9"
+red = "#ff5555"
+yellow = "#f1fa8c"
+
+[prompt]
+character = "❯"
+character_color = "{palette.pink}"
+segments = ["cwd", "git-status", "ai-tier", "exit-code"]
+separator = "minimal"
+glyphs = "nerd-default"
+
+[roles]
+ai_tier_local = "{palette.green}"
+ai_tier_cloud = "{palette.cyan}"
+drachma_low = "{palette.red}"
+drachma_ok = "{palette.muted}"
+exit_ok = "{palette.muted}"
+exit_err = "{palette.red}"
+
+[syntax]
+keyword = "{palette.pink}"
+string = "{palette.yellow}"
+number = "{palette.purple}"
+function = "{palette.green}"
+type = "{palette.cyan}"
+comment = "{palette.muted}"
