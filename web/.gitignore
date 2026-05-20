@@ -4,6 +4,7 @@ dist/
 public/themes/
 public/schemas/
 public/_headers
+src/lib/fonts.generated.json
 .env
 .env.local
 .DS_Store
