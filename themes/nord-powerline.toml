@@ -2,10 +2,18 @@ schema = "https://theme-atoms.com/schemas/theme-v1.json"
 
 [meta]
 id = "nord-powerline"
-version = "1.0.0"
+version = "1.1.0"
 display_name = "Nord — Powerline"
-description = "Nord palette with powerline separators and Nerd Font glyphs. Cool blues, full segment chain."
+description = "Nord palette with powerline separators and Nerd Font glyphs. North + south status bars, JetBrainsMono Nerd Font preferred."
 extends_brand = "nord"
+
+[font]
+family = "JetBrainsMono Nerd Font"
+fallback = ["JetBrains Mono", "Fira Code", "Menlo", "monospace"]
+size = 13
+weight = 400
+ligatures = true
+nerd_font = true
 
 [palette]
 # Polar Night
@@ -61,3 +69,19 @@ number = "{palette.yellow}"
 function = "{palette.cyan}"
 type = "{palette.purple}"
 comment = "{palette.muted}"
+
+[layout.north]
+enabled = true
+background = "{palette.nord1}"
+foreground = "{palette.fg}"
+left = ["session", "host"]
+center = []
+right = ["time", "ai-tier"]
+
+[layout.south]
+enabled = true
+background = "{palette.nord1}"
+foreground = "{palette.muted}"
+left = ["cwd", "git-status"]
+center = []
+right = ["exit-code", "duration"]
