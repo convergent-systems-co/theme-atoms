@@ -32,6 +32,8 @@ const SEGMENT_LABEL: Record<string, string> = {
   venv: '(env)',
   session: '#session',
   time: '14:32',
+  weather: ' 72°F',
+  battery: ' 87%',
   'ai-suggestion': 'AI tip',
 };
 
