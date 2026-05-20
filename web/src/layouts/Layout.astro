@@ -1,0 +1,258 @@
+---
+export interface Props {
+  title: string;
+  description?: string;
+  section?: 'home' | 'themes' | 'builder' | 'install' | 'how-to-use' | 'request';
+}
+
+const { title, description = 'Self-contained terminal themes for aish and other shells. Composable, versioned, served fresh from theme-atoms.com.', section = 'home' } = Astro.props;
+
+const navItems = [
+  { id: 'home', label: 'Home', href: '/' },
+  { id: 'themes', label: 'Themes', href: '/themes' },
+  { id: 'builder', label: 'Builder', href: '/builder' },
+  { id: 'install', label: 'Install', href: '/install' },
+  { id: 'how-to-use', label: 'How to use', href: '/how-to-use' },
+  { id: 'request', label: 'Request a theme', href: '/request-theme' },
+] as const;
+
+// Hardcoded Convergent Systems palette (the same brand drives all *-atoms sites).
+const lightVars = {
+  bg: '#F9F7F0',
+  surface: '#FDFCF7',
+  surfaceElevated: '#FFFFFF',
+  textPrimary: '#07090F',
+  textSecondary: '#11182C',
+  textTertiary: '#7D8699',
+  primary: '#5CD6FF',
+  primaryHover: '#8DE4FF',
+  accent: '#F4C75E',
+  accentHover: '#FFD982',
+  warning: '#FF8A3D',
+  warningHover: '#FFB070',
+};
+
+const darkVars = {
+  bg: '#07090F',
+  surface: '#0B1020',
+  surfaceElevated: '#11182C',
+  textPrimary: '#EEF1F7',
+  textSecondary: '#A4ADBF',
+  textTertiary: '#7D8699',
+  primary: '#5CD6FF',
+  primaryHover: '#8DE4FF',
+  accent: '#F4C75E',
+  accentHover: '#FFD982',
+  warning: '#FF8A3D',
+  warningHover: '#FFB070',
+};
+
+const markColors = {
+  d1: '#5CD6FF', // frost-cyan
+  d2: '#F4C75E', // solar-gold
+  d3: '#FF8A3D', // ember-orange
+  d4: '#EEF1F7', // snow
+};
+
+const fontSans = 'system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:site_name" content="Theme Atoms" />
+    <meta name="theme-color" content="#07090F" />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230B1020'/%3E%3Ccircle cx='10' cy='10' r='4' fill='%235CD6FF'/%3E%3Ccircle cx='22' cy='10' r='4' fill='%23F4C75E'/%3E%3Ccircle cx='10' cy='22' r='4' fill='%23FF8A3D'/%3E%3Ccircle cx='22' cy='22' r='4' fill='%23EEF1F7'/%3E%3C/svg%3E" />
+  </head>
+  <body>
+    <div class="shell">
+      <main class="content">
+        <slot />
+        <footer class="footer">
+          <p>
+            Open source ·
+            <a href="https://github.com/convergent-systems-co/theme-atoms">github.com/convergent-systems-co/theme-atoms</a>
+          </p>
+          <p class="micro">A Convergent Systems project · Built on Astro, deployed on Cloudflare Pages</p>
+        </footer>
+      </main>
+
+      <aside class="sidenav">
+        <a class="brand" href="/">
+          <span class="mark" aria-hidden="true">
+            <span class="dot dot-1"></span>
+            <span class="dot dot-2"></span>
+            <span class="dot dot-3"></span>
+            <span class="dot dot-4"></span>
+          </span>
+          <span class="brand-text">Theme<br/>Atoms</span>
+        </a>
+
+        <nav class="nav">
+          <ul>
+            {navItems.map((item) => (
+              <li>
+                <a
+                  href={item.href}
+                  class:list={['nav-link', { active: item.id === section }]}
+                >
+                  {item.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        <div class="aside-meta">
+          <a href="https://github.com/convergent-systems-co/theme-atoms" class="meta-link">
+            <span>↗</span> GitHub
+          </a>
+          <a href="https://github.com/convergent-systems-co/aish" class="meta-link">
+            <span>↗</span> aish
+          </a>
+        </div>
+      </aside>
+    </div>
+
+    <style is:global define:vars={{
+      lightBg: lightVars.bg,
+      lightSurface: lightVars.surface,
+      lightSurfaceElevated: lightVars.surfaceElevated,
+      lightTextPrimary: lightVars.textPrimary,
+      lightTextSecondary: lightVars.textSecondary,
+      lightTextTertiary: lightVars.textTertiary,
+      lightPrimary: lightVars.primary,
+      lightPrimaryHover: lightVars.primaryHover,
+      lightAccent: lightVars.accent,
+      lightAccentHover: lightVars.accentHover,
+      lightWarning: lightVars.warning,
+      darkBg: darkVars.bg,
+      darkSurface: darkVars.surface,
+      darkSurfaceElevated: darkVars.surfaceElevated,
+      darkTextPrimary: darkVars.textPrimary,
+      darkTextSecondary: darkVars.textSecondary,
+      darkTextTertiary: darkVars.textTertiary,
+      darkPrimary: darkVars.primary,
+      darkPrimaryHover: darkVars.primaryHover,
+      darkAccent: darkVars.accent,
+      darkAccentHover: darkVars.accentHover,
+      darkWarning: darkVars.warning,
+      brandDot1: markColors.d1,
+      brandDot2: markColors.d2,
+      brandDot3: markColors.d3,
+      brandDot4: markColors.d4,
+      brandFontSans: fontSans,
+    }}>
+      :root {
+        --bg: var(--lightBg);
+        --surface: var(--lightSurface);
+        --surface-elevated: var(--lightSurfaceElevated);
+        --text-primary: var(--lightTextPrimary);
+        --text-secondary: var(--lightTextSecondary);
+        --text-tertiary: var(--lightTextTertiary);
+        --primary: var(--lightPrimary);
+        --primary-hover: var(--lightPrimaryHover);
+        --accent: var(--lightAccent);
+        --accent-hover: var(--lightAccentHover);
+        --warning: var(--lightWarning);
+
+        --font-sans: var(--brandFontSans);
+        --font-mono: 'JetBrains Mono', 'Fira Code', Menlo, Monaco, monospace;
+
+        --sidenav-width: 220px;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: var(--darkBg);
+          --surface: var(--darkSurface);
+          --surface-elevated: var(--darkSurfaceElevated);
+          --text-primary: var(--darkTextPrimary);
+          --text-secondary: var(--darkTextSecondary);
+          --text-tertiary: var(--darkTextTertiary);
+          --primary: var(--darkPrimary);
+          --primary-hover: var(--darkPrimaryHover);
+          --accent: var(--darkAccent);
+          --accent-hover: var(--darkAccentHover);
+          --warning: var(--darkWarning);
+        }
+      }
+
+      * { box-sizing: border-box; }
+      html, body { margin: 0; padding: 0; }
+      body {
+        background: var(--bg);
+        color: var(--text-primary);
+        font-family: var(--font-sans);
+        font-size: 16px;
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .shell {
+        display: grid;
+        grid-template-columns: 1fr var(--sidenav-width);
+        min-height: 100vh;
+        max-width: 1320px;
+        margin: 0 auto;
+      }
+
+      .content { min-width: 0; padding: 32px 32px 0 32px; }
+      .footer { margin-top: 64px; padding: 24px 0; color: var(--text-tertiary); font-size: 13px; border-top: 1px solid var(--surface); }
+      .footer a { color: var(--text-secondary); }
+      .footer .micro { font-size: 12px; margin-top: 4px; }
+
+      .sidenav {
+        position: sticky; top: 0; height: 100vh; padding: 32px 24px;
+        border-left: 1px solid var(--surface);
+        display: flex; flex-direction: column; gap: 32px;
+      }
+      .brand { display: inline-flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text-primary); }
+      .brand-text { font-weight: 700; font-size: 18px; line-height: 1.1; }
+      .mark {
+        display: grid; grid-template-columns: repeat(2, 1fr); gap: 3px;
+        width: 32px; height: 32px; padding: 4px;
+        background: var(--surface); border-radius: 8px; flex-shrink: 0;
+      }
+      .dot { width: 100%; height: 100%; border-radius: 50%; }
+      .dot-1 { background: var(--brandDot1); }
+      .dot-2 { background: var(--brandDot2); }
+      .dot-3 { background: var(--brandDot3); }
+      .dot-4 { background: var(--brandDot4); }
+
+      .nav ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 4px; }
+      .nav-link {
+        display: block; padding: 8px 12px; border-radius: 6px;
+        color: var(--text-secondary); text-decoration: none; font-size: 14px;
+      }
+      .nav-link:hover { background: var(--surface); color: var(--text-primary); }
+      .nav-link.active { background: var(--surface-elevated); color: var(--text-primary); font-weight: 600; }
+
+      .aside-meta { margin-top: auto; display: flex; flex-direction: column; gap: 6px; }
+      .meta-link { color: var(--text-tertiary); font-size: 13px; text-decoration: none; }
+      .meta-link:hover { color: var(--text-secondary); }
+
+      h1, h2, h3 { color: var(--text-primary); line-height: 1.25; }
+      h1 { font-size: 40px; margin: 0 0 16px; letter-spacing: -0.01em; }
+      h2 { font-size: 24px; margin: 32px 0 12px; }
+      h3 { font-size: 18px; margin: 24px 0 8px; }
+      p { color: var(--text-secondary); }
+      a { color: var(--primary); }
+      a:hover { color: var(--primary-hover); }
+
+      code { font-family: var(--font-mono); font-size: 0.95em; background: var(--surface); padding: 2px 6px; border-radius: 4px; }
+      pre { background: var(--surface); padding: 16px; border-radius: 8px; overflow-x: auto; font-family: var(--font-mono); font-size: 13px; }
+      pre code { background: transparent; padding: 0; }
+
+      @media (max-width: 880px) {
+        .shell { grid-template-columns: 1fr; }
+        .sidenav { position: relative; height: auto; border-left: none; border-bottom: 1px solid var(--surface); }
+      }
+    </style>
+  </body>
+</html>
