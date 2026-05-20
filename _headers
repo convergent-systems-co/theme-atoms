@@ -1,0 +1,11 @@
+/themes/*.toml
+  Content-Type: application/toml; charset=utf-8
+  Cache-Control: public, max-age=300, must-revalidate
+
+/themes/index.json
+  Content-Type: application/json; charset=utf-8
+  Cache-Control: public, max-age=60, must-revalidate
+
+/schemas/*.json
+  Content-Type: application/schema+json; charset=utf-8
+  Cache-Control: public, max-age=3600, must-revalidate

@@ -37,12 +37,23 @@ theme-atoms/
 
 ## How to consume
 
-Machine-readable exports are published in [`exports/`](./exports/) on every release:
+### v0.1 — self-contained TOML themes (current)
 
-- `exports/manifest.json` — lightweight discovery (name, version, counts)
-- `exports/catalog.json` — full catalog dump (every atom, composition, rule)
+Themes are served as standalone TOML files at predictable URLs. Consumers (aish v0.2, future runtimes) perform a **single HTTP GET per theme** — no follow-on fetches.
 
-Exports are deterministic, signed, and versioned. See [`ATOMS.yml`](./ATOMS.yml) for the manifest and the conformance spec.
+| URL | Content |
+|---|---|
+| `https://theme-atoms.com/themes/index.json` | Discoverable list of themes |
+| `https://theme-atoms.com/themes/<id>.toml` | Individual theme |
+| `https://theme-atoms.com/schemas/theme-v1.json` | JSON Schema for theme TOML |
+
+See [`docs/publishing.md`](./docs/publishing.md) for the full contract and [`schemas/theme-v1.json`](./schemas/theme-v1.json) for the wire format. Seed themes live under [`themes/`](./themes/).
+
+Validate locally: `python3 scripts/validate.py` (requires Python 3.11+ and `jsonschema`).
+
+### Future — full atom-based exports
+
+The atom types listed above feed a future composition pipeline producing `exports/manifest.json` + `exports/catalog.json`. v0.1 ships only the consumer-facing TOML contract; the full atom model lands in a later milestone.
 
 ## How to contribute
 

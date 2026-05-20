@@ -1,0 +1,35 @@
+schema = "https://theme-atoms.com/schemas/theme-v1.json"
+
+[meta]
+id = "default"
+version = "1.0.0"
+display_name = "Default"
+description = "Minimal terminal-native theme. Single-character prompt, no separators, no glyphs. Works on any terminal without font configuration."
+
+[palette]
+fg = "#d0d0d0"
+bg = "#1c1c1c"
+green = "#87af5f"
+yellow = "#d7af5f"
+red = "#d75f5f"
+blue = "#87afd7"
+muted = "#767676"
+
+[prompt]
+character = "❯"
+character_color = "{palette.blue}"
+segments = ["cwd", "git-status", "exit-code"]
+separator = "none"
+glyphs = "ascii"
+
+[roles]
+ai_tier_local = "{palette.green}"
+ai_tier_cloud = "{palette.blue}"
+exit_ok = "{palette.muted}"
+exit_err = "{palette.red}"
+
+[syntax]
+keyword = "{palette.blue}"
+string = "{palette.green}"
+number = "{palette.yellow}"
+comment = "{palette.muted}"
