@@ -1,0 +1,126 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://theme-atoms.com/schemas/theme-v1.json",
+  "title": "theme-atoms v1 theme",
+  "description": "A self-contained shell/terminal theme. Consumed by aish v0.2 via a single HTTP GET; no second fetch required for brand-atoms or any external reference.",
+  "type": "object",
+  "required": ["schema", "meta", "palette", "prompt"],
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "type": "string",
+      "format": "uri",
+      "const": "https://theme-atoms.com/schemas/theme-v1.json",
+      "description": "Pin the schema URI so consumers can verify they understand this version."
+    },
+    "meta": {
+      "type": "object",
+      "required": ["id", "version", "display_name"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]{1,62}[a-z0-9]$",
+          "description": "URL-safe slug; also the filename stem (id.toml)."
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[A-Za-z0-9.-]+)?$",
+          "description": "Semver. Theme content changes bump version."
+        },
+        "display_name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 280
+        },
+        "extends_brand": {
+          "type": "string",
+          "description": "Documentary reference to a brand-atoms brand. NOT a fetch target — palette below MUST be inlined."
+        }
+      }
+    },
+    "palette": {
+      "type": "object",
+      "minProperties": 2,
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$",
+        "description": "Hex color. 3/6/8-digit (#RGB, #RRGGBB, #RRGGBBAA) accepted."
+      },
+      "required": ["fg", "bg"],
+      "description": "Inlined palette. Keys are role names (e.g., fg, bg, green, blue, accent). Single-fetch contract: do not reference external palettes."
+    },
+    "prompt": {
+      "type": "object",
+      "required": ["character", "character_color"],
+      "additionalProperties": false,
+      "properties": {
+        "character": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8,
+          "description": "Prompt character(s). Unicode glyphs allowed."
+        },
+        "character_color": {
+          "$ref": "#/$defs/colorRef"
+        },
+        "segments": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "cwd",
+              "git-status",
+              "ai-tier",
+              "drachma-balance",
+              "exit-code",
+              "duration",
+              "k8s-context",
+              "user",
+              "host",
+              "venv"
+            ]
+          },
+          "uniqueItems": true,
+          "description": "Ordered list of segments to render. Unknown segments MUST be rejected by the consumer."
+        },
+        "separator": {
+          "type": "string",
+          "enum": ["powerline", "minimal", "classic", "none"],
+          "default": "none"
+        },
+        "glyphs": {
+          "type": "string",
+          "enum": ["nerd-default", "ascii", "minimal"],
+          "default": "ascii",
+          "description": "Glyph set. nerd-default requires a Nerd Font."
+        }
+      }
+    },
+    "roles": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/colorRef"
+      },
+      "description": "Semantic role → color mappings. Consumers look up runtime roles here (e.g., ai_tier_local)."
+    },
+    "syntax": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/colorRef"
+      },
+      "description": "Syntax-highlighting token → color mappings. Optional; consumers fall back to roles or defaults."
+    }
+  },
+  "$defs": {
+    "colorRef": {
+      "type": "string",
+      "pattern": "^(?:#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})|\\{palette\\.[a-zA-Z0-9_-]+\\})$",
+      "description": "Either a hex color (#RGB / #RRGGBB / #RRGGBBAA) or a palette reference {palette.NAME} that MUST resolve within this theme's own palette block. No external references."
+    }
+  }
+}
