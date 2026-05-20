@@ -1,20 +1,32 @@
 import { useMemo, useState } from 'react';
-import type { Theme, FontSpec, HorizontalBar, VerticalBar } from '../lib/themes';
+import type { Theme, FontSpec, HorizontalBar, ElementsMap, ElementStyle } from '../lib/themes';
 import TerminalPreview from './TerminalPreview';
+import { ELEMENT_CATALOG, CATEGORY_LABEL, PROMPT_ALLOWED_IDS, ALL_ELEMENT_IDS, type ElementCategory } from '../lib/elements';
+import { GLYPH_GROUPS } from '../lib/glyphs';
 
 export interface BuilderProps {
   seedThemes: Theme[];
   fontFamilies?: string[];
 }
 
-const SEGMENTS = ['cwd', 'git-status', 'ai-tier', 'drachma-balance', 'exit-code', 'duration', 'k8s-context', 'user', 'host', 'venv', 'weather', 'time', 'battery'];
-const BAR_ELEMENTS = [...SEGMENTS, 'session', 'ai-suggestion'];
 const SEPARATORS = ['powerline', 'minimal', 'classic', 'none'] as const;
 const GLYPHS = ['nerd-default', 'ascii', 'minimal'] as const;
 const WEIGHTS = [100, 200, 300, 400, 500, 600, 700, 800, 900] as const;
 
-type HBarKey = 'north' | 'south';
-type VBarKey = 'east' | 'west';
+// Group catalog by category for rendering chip lists
+function groupByCategory(ids: string[]): Record<ElementCategory, string[]> {
+  const groups = {} as Record<ElementCategory, string[]>;
+  for (const id of ids) {
+    const spec = ELEMENT_CATALOG.find((e) => e.id === id);
+    if (!spec) continue;
+    if (!groups[spec.category]) groups[spec.category] = [];
+    groups[spec.category].push(id);
+  }
+  return groups;
+}
+
+const PROMPT_GROUPS = groupByCategory(PROMPT_ALLOWED_IDS);
+const BAR_GROUPS = groupByCategory(ALL_ELEMENT_IDS);
 
 function emitToml(t: Theme): string {
   const meta = t.meta;
@@ -53,30 +65,27 @@ function emitToml(t: Theme): string {
     for (const [k, v] of Object.entries(t.syntax)) s += `${k} = "${v}"\n`;
   }
 
+  const emitHBar = (dir: 'north' | 'south', b: HorizontalBar) => {
+    s += `\n[layout.${dir}]\n`;
+    s += `enabled = true\n`;
+    if (b.background) s += `background = "${b.background}"\n`;
+    if (b.foreground) s += `foreground = "${b.foreground}"\n`;
+    s += `left = [${(b.left ?? []).map((x) => `"${x}"`).join(', ')}]\n`;
+    s += `center = [${(b.center ?? []).map((x) => `"${x}"`).join(', ')}]\n`;
+    s += `right = [${(b.right ?? []).map((x) => `"${x}"`).join(', ')}]\n`;
+    if (b.elements && Object.keys(b.elements).length) {
+      for (const [elId, style] of Object.entries(b.elements)) {
+        if (!style || (style.icon == null && !style.color)) continue;
+        s += `\n[layout.${dir}.elements."${elId}"]\n`;
+        if (style.icon !== undefined) s += `icon = ${JSON.stringify(style.icon)}\n`;
+        if (style.color) s += `color = "${style.color}"\n`;
+      }
+    }
+  };
+
   if (t.layout) {
-    for (const dir of ['north', 'south'] as const) {
-      const b = t.layout[dir];
-      if (!b?.enabled) continue;
-      s += `\n[layout.${dir}]\n`;
-      s += `enabled = true\n`;
-      if (b.background) s += `background = "${b.background}"\n`;
-      if (b.foreground) s += `foreground = "${b.foreground}"\n`;
-      s += `left = [${(b.left ?? []).map((x) => `"${x}"`).join(', ')}]\n`;
-      s += `center = [${(b.center ?? []).map((x) => `"${x}"`).join(', ')}]\n`;
-      s += `right = [${(b.right ?? []).map((x) => `"${x}"`).join(', ')}]\n`;
-    }
-    for (const dir of ['east', 'west'] as const) {
-      const b = t.layout[dir];
-      if (!b?.enabled) continue;
-      s += `\n[layout.${dir}]\n`;
-      s += `enabled = true\n`;
-      if (b.background) s += `background = "${b.background}"\n`;
-      if (b.foreground) s += `foreground = "${b.foreground}"\n`;
-      if (b.width != null) s += `width = ${b.width}\n`;
-      s += `top = [${(b.top ?? []).map((x) => `"${x}"`).join(', ')}]\n`;
-      s += `center = [${(b.center ?? []).map((x) => `"${x}"`).join(', ')}]\n`;
-      s += `bottom = [${(b.bottom ?? []).map((x) => `"${x}"`).join(', ')}]\n`;
-    }
+    if (t.layout.north?.enabled) emitHBar('north', t.layout.north);
+    if (t.layout.south?.enabled) emitHBar('south', t.layout.south);
   }
   return s;
 }
@@ -85,22 +94,127 @@ function slugify(name: string): string {
   return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60) || 'my-theme';
 }
 
-function ChipToggleList({ value, options, onChange }: { value: string[]; options: string[]; onChange: (v: string[]) => void }) {
+interface ChipListProps { value: string[]; groups: Record<ElementCategory, string[]>; onChange: (v: string[]) => void; }
+function CategorizedChips({ value, groups, onChange }: ChipListProps) {
   return (
-    <div className="chips">
-      {options.map((o) => {
-        const on = value.includes(o);
+    <div className="cat-chips">
+      {(Object.keys(groups) as ElementCategory[]).map((cat) => (
+        <div key={cat} className="cat-group">
+          <div className="cat-label">{CATEGORY_LABEL[cat]}</div>
+          <div className="chips">
+            {groups[cat].map((o) => {
+              const on = value.includes(o);
+              return (
+                <label key={o} className={`chip ${on ? 'on' : ''}`}>
+                  <input type="checkbox" checked={on} onChange={() => {
+                    if (on) onChange(value.filter((x) => x !== o));
+                    else onChange([...value, o]);
+                  }} />
+                  {o}
+                </label>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// Per-element style editor: shown for each element actually used in any bar
+function ElementStyleEditor({
+  ids, style, onChange,
+}: {
+  ids: string[];
+  style: ElementsMap;
+  onChange: (s: ElementsMap) => void;
+}) {
+  if (ids.length === 0) return null;
+  const update = (id: string, patch: Partial<ElementStyle>) => {
+    const cur = style[id] ?? {};
+    const next = { ...cur, ...patch };
+    // Drop empty entries
+    const cleaned: ElementStyle = {};
+    if (next.icon !== undefined && next.icon !== '') cleaned.icon = next.icon;
+    if (next.color) cleaned.color = next.color;
+    const map = { ...style };
+    if (Object.keys(cleaned).length === 0) delete map[id];
+    else map[id] = cleaned;
+    onChange(map);
+  };
+  return (
+    <div className="estyle">
+      {ids.map((id) => {
+        const cur = style[id] ?? {};
         return (
-          <label key={o} className={`chip ${on ? 'on' : ''}`}>
-            <input type="checkbox" checked={on} onChange={() => {
-              if (on) onChange(value.filter((x) => x !== o));
-              else onChange([...value, o]);
-            }} />
-            {o}
-          </label>
+          <div key={id} className="estyle-row">
+            <code className="estyle-id">{id}</code>
+            <input
+              type="text"
+              className="estyle-icon"
+              placeholder="(default)"
+              value={cur.icon ?? ''}
+              onChange={(e) => update(id, { icon: e.target.value })}
+              aria-label={`Icon for ${id}`}
+              maxLength={6}
+            />
+            <input
+              type="text"
+              className="estyle-color"
+              placeholder="#hex or {palette.x}"
+              value={cur.color ?? ''}
+              onChange={(e) => update(id, { color: e.target.value })}
+              aria-label={`Color for ${id}`}
+            />
+          </div>
         );
       })}
     </div>
+  );
+}
+
+// Glyph library: browse + copy. Click a glyph to copy to clipboard.
+function GlyphLibrary({ onPick }: { onPick: (char: string) => void }) {
+  const [filter, setFilter] = useState('');
+  const [active, setActive] = useState<string | null>(null);
+  const groups = useMemo(() => {
+    const q = filter.trim().toLowerCase();
+    if (!q) return GLYPH_GROUPS;
+    return GLYPH_GROUPS.map((g) => ({ ...g, glyphs: g.glyphs.filter((x) => x.name.toLowerCase().includes(q) || x.char === q) })).filter((g) => g.glyphs.length > 0);
+  }, [filter]);
+  const click = (char: string) => {
+    navigator.clipboard.writeText(char);
+    setActive(char);
+    onPick(char);
+    setTimeout(() => setActive(null), 700);
+  };
+  return (
+    <section className="glyphs">
+      <h3>Glyphs library — mix-and-match families</h3>
+      <p className="hint">Click any glyph to copy it to your clipboard. Paste into an element's icon field (below each bar) or anywhere else.</p>
+      <input className="gfilter" type="search" placeholder="Filter (e.g. branch, weather, docker)…" value={filter} onChange={(e) => setFilter(e.target.value)} />
+      <div className="glyph-grid">
+        {groups.map((g) => (
+          <div key={g.id} className="ggroup">
+            <div className="ggroup-label">{g.label}</div>
+            <div className="grow">
+              {g.glyphs.map((gl) => (
+                <button
+                  key={gl.name}
+                  type="button"
+                  className={`gbtn ${active === gl.char ? 'flash' : ''}`}
+                  title={`${gl.name} — click to copy`}
+                  onClick={() => click(gl.char)}
+                >
+                  <span className="ch">{gl.char}</span>
+                  <span className="nm">{gl.name}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
   );
 }
 
@@ -115,7 +229,7 @@ export default function Builder({ seedThemes, fontFamilies = [] }: BuilderProps)
   const [promptColor, setPromptColor] = useState(seed.prompt.character_color);
   const [segments, setSegments] = useState<string[]>(seed.prompt.segments ?? []);
   const [separator, setSeparator] = useState<typeof SEPARATORS[number]>(seed.prompt.separator ?? 'none');
-  const [glyphs, setGlyphs] = useState<typeof GLYPHS[number]>(seed.prompt.glyphs ?? 'ascii');
+  const [glyphsMode, setGlyphsMode] = useState<typeof GLYPHS[number]>(seed.prompt.glyphs ?? 'ascii');
 
   const [fontFamily, setFontFamily] = useState(seed.font?.family ?? '');
   const [fontSize, setFontSize] = useState<number | undefined>(seed.font?.size);
@@ -124,12 +238,18 @@ export default function Builder({ seedThemes, fontFamilies = [] }: BuilderProps)
   const [fontNerd, setFontNerd] = useState(seed.font?.nerd_font ?? false);
 
   const [northEnabled, setNorthEnabled] = useState(seed.layout?.north?.enabled ?? false);
+  const [northBg, setNorthBg] = useState(seed.layout?.north?.background ?? '');
+  const [northFg, setNorthFg] = useState(seed.layout?.north?.foreground ?? '');
   const [northLeft, setNorthLeft] = useState<string[]>(seed.layout?.north?.left ?? []);
   const [northRight, setNorthRight] = useState<string[]>(seed.layout?.north?.right ?? []);
+  const [northElements, setNorthElements] = useState<ElementsMap>(seed.layout?.north?.elements ?? {});
 
   const [southEnabled, setSouthEnabled] = useState(seed.layout?.south?.enabled ?? false);
+  const [southBg, setSouthBg] = useState(seed.layout?.south?.background ?? '');
+  const [southFg, setSouthFg] = useState(seed.layout?.south?.foreground ?? '');
   const [southLeft, setSouthLeft] = useState<string[]>(seed.layout?.south?.left ?? []);
   const [southRight, setSouthRight] = useState<string[]>(seed.layout?.south?.right ?? []);
+  const [southElements, setSouthElements] = useState<ElementsMap>(seed.layout?.south?.elements ?? {});
 
   const id = slugify(displayName);
 
@@ -141,8 +261,20 @@ export default function Builder({ seedThemes, fontFamilies = [] }: BuilderProps)
     ...(fontNerd ? { nerd_font: true } : {}),
   } : undefined;
 
-  const north: HorizontalBar | undefined = northEnabled ? { enabled: true, left: northLeft, center: [], right: northRight } : undefined;
-  const south: HorizontalBar | undefined = southEnabled ? { enabled: true, left: southLeft, center: [], right: southRight } : undefined;
+  const north: HorizontalBar | undefined = northEnabled ? {
+    enabled: true,
+    ...(northBg ? { background: northBg } : {}),
+    ...(northFg ? { foreground: northFg } : {}),
+    left: northLeft, center: [], right: northRight,
+    ...(Object.keys(northElements).length ? { elements: northElements } : {}),
+  } : undefined;
+  const south: HorizontalBar | undefined = southEnabled ? {
+    enabled: true,
+    ...(southBg ? { background: southBg } : {}),
+    ...(southFg ? { foreground: southFg } : {}),
+    left: southLeft, center: [], right: southRight,
+    ...(Object.keys(southElements).length ? { elements: southElements } : {}),
+  } : undefined;
 
   const layout = (north || south) ? { ...(north ? { north } : {}), ...(south ? { south } : {}) } : undefined;
 
@@ -150,7 +282,7 @@ export default function Builder({ seedThemes, fontFamilies = [] }: BuilderProps)
     schema: 'https://theme-atoms.com/schemas/theme-v1.json',
     meta: { id, version: '0.1.0', display_name: displayName, ...(extendsBrand ? { extends_brand: extendsBrand } : {}) },
     palette,
-    prompt: { character: promptChar, character_color: promptColor, segments, separator, glyphs },
+    prompt: { character: promptChar, character_color: promptColor, segments, separator, glyphs: glyphsMode },
     roles: seed.roles,
     syntax: seed.syntax,
     ...(font ? { font } : {}),
@@ -165,18 +297,24 @@ export default function Builder({ seedThemes, fontFamilies = [] }: BuilderProps)
     setPromptColor(seed.prompt.character_color);
     setSegments(seed.prompt.segments ?? []);
     setSeparator(seed.prompt.separator ?? 'none');
-    setGlyphs(seed.prompt.glyphs ?? 'ascii');
+    setGlyphsMode(seed.prompt.glyphs ?? 'ascii');
     setFontFamily(seed.font?.family ?? '');
     setFontSize(seed.font?.size);
     setFontWeight(seed.font?.weight);
     setFontLigatures(seed.font?.ligatures ?? false);
     setFontNerd(seed.font?.nerd_font ?? false);
     setNorthEnabled(seed.layout?.north?.enabled ?? false);
+    setNorthBg(seed.layout?.north?.background ?? '');
+    setNorthFg(seed.layout?.north?.foreground ?? '');
     setNorthLeft(seed.layout?.north?.left ?? []);
     setNorthRight(seed.layout?.north?.right ?? []);
+    setNorthElements(seed.layout?.north?.elements ?? {});
     setSouthEnabled(seed.layout?.south?.enabled ?? false);
+    setSouthBg(seed.layout?.south?.background ?? '');
+    setSouthFg(seed.layout?.south?.foreground ?? '');
     setSouthLeft(seed.layout?.south?.left ?? []);
     setSouthRight(seed.layout?.south?.right ?? []);
+    setSouthElements(seed.layout?.south?.elements ?? {});
   };
 
   const copyToml = () => { navigator.clipboard.writeText(toml); };
@@ -217,9 +355,7 @@ export default function Builder({ seedThemes, fontFamilies = [] }: BuilderProps)
             <label>Family
               <input value={fontFamily} onChange={(e) => setFontFamily(e.target.value)} placeholder="e.g. JetBrainsMono Nerd Font" list="font-families" />
             </label>
-            <datalist id="font-families">
-              {fontFamilies.map((f) => <option key={f} value={f} />)}
-            </datalist>
+            <datalist id="font-families">{fontFamilies.map((f) => <option key={f} value={f} />)}</datalist>
             <div className="row2">
               <label>Size<input type="number" min={6} max={48} value={fontSize ?? ''} onChange={(e) => setFontSize(e.target.value ? Number(e.target.value) : undefined)} /></label>
               <label>Weight
@@ -243,13 +379,13 @@ export default function Builder({ seedThemes, fontFamilies = [] }: BuilderProps)
               </select>
             </label>
             <label>Glyphs
-              <select value={glyphs} onChange={(e) => setGlyphs(e.target.value as typeof GLYPHS[number])}>
+              <select value={glyphsMode} onChange={(e) => setGlyphsMode(e.target.value as typeof GLYPHS[number])}>
                 {GLYPHS.map((s) => <option key={s} value={s}>{s}</option>)}
               </select>
             </label>
             <div className="ckwrap">
               <div className="seg-label">Segments</div>
-              <ChipToggleList value={segments} options={SEGMENTS} onChange={setSegments} />
+              <CategorizedChips value={segments} groups={PROMPT_GROUPS} onChange={setSegments} />
             </div>
           </section>
 
@@ -258,8 +394,15 @@ export default function Builder({ seedThemes, fontFamilies = [] }: BuilderProps)
             <label className="cb"><input type="checkbox" checked={northEnabled} onChange={(e) => setNorthEnabled(e.target.checked)} /> Enabled</label>
             {northEnabled && (
               <>
-                <div className="ckwrap"><div className="seg-label">Left</div><ChipToggleList value={northLeft} options={BAR_ELEMENTS} onChange={setNorthLeft} /></div>
-                <div className="ckwrap"><div className="seg-label">Right</div><ChipToggleList value={northRight} options={BAR_ELEMENTS} onChange={setNorthRight} /></div>
+                <div className="row2">
+                  <label>Background<input value={northBg} placeholder="#hex or {palette.x}" onChange={(e) => setNorthBg(e.target.value)} /></label>
+                  <label>Foreground<input value={northFg} placeholder="#hex or {palette.x}" onChange={(e) => setNorthFg(e.target.value)} /></label>
+                </div>
+                <div className="ckwrap"><div className="seg-label">Left</div><CategorizedChips value={northLeft} groups={BAR_GROUPS} onChange={setNorthLeft} /></div>
+                <div className="ckwrap"><div className="seg-label">Right</div><CategorizedChips value={northRight} groups={BAR_GROUPS} onChange={setNorthRight} /></div>
+                <div className="ckwrap"><div className="seg-label">Element style overrides</div>
+                  <ElementStyleEditor ids={[...new Set([...northLeft, ...northRight])]} style={northElements} onChange={setNorthElements} />
+                </div>
               </>
             )}
           </section>
@@ -269,8 +412,15 @@ export default function Builder({ seedThemes, fontFamilies = [] }: BuilderProps)
             <label className="cb"><input type="checkbox" checked={southEnabled} onChange={(e) => setSouthEnabled(e.target.checked)} /> Enabled</label>
             {southEnabled && (
               <>
-                <div className="ckwrap"><div className="seg-label">Left</div><ChipToggleList value={southLeft} options={BAR_ELEMENTS} onChange={setSouthLeft} /></div>
-                <div className="ckwrap"><div className="seg-label">Right</div><ChipToggleList value={southRight} options={BAR_ELEMENTS} onChange={setSouthRight} /></div>
+                <div className="row2">
+                  <label>Background<input value={southBg} placeholder="#hex or {palette.x}" onChange={(e) => setSouthBg(e.target.value)} /></label>
+                  <label>Foreground<input value={southFg} placeholder="#hex or {palette.x}" onChange={(e) => setSouthFg(e.target.value)} /></label>
+                </div>
+                <div className="ckwrap"><div className="seg-label">Left</div><CategorizedChips value={southLeft} groups={BAR_GROUPS} onChange={setSouthLeft} /></div>
+                <div className="ckwrap"><div className="seg-label">Right</div><CategorizedChips value={southRight} groups={BAR_GROUPS} onChange={setSouthRight} /></div>
+                <div className="ckwrap"><div className="seg-label">Element style overrides</div>
+                  <ElementStyleEditor ids={[...new Set([...southLeft, ...southRight])]} style={southElements} onChange={setSouthElements} />
+                </div>
               </>
             )}
           </section>
@@ -292,6 +442,9 @@ export default function Builder({ seedThemes, fontFamilies = [] }: BuilderProps)
         <div className="preview-col">
           <h3>Live preview</h3>
           <TerminalPreview theme={theme} />
+
+          <GlyphLibrary onPick={() => {}} />
+
           <h3 style={{ marginTop: 24 }}>theme.toml</h3>
           <pre className="output"><code>{toml}</code></pre>
           <div className="actions">
@@ -305,27 +458,35 @@ export default function Builder({ seedThemes, fontFamilies = [] }: BuilderProps)
 
       <style>{`
         .builder { font-family: var(--font-sans); }
-        .grid { display: grid; grid-template-columns: 380px 1fr; gap: 24px; }
+        .grid { display: grid; grid-template-columns: 400px 1fr; gap: 24px; }
         .controls { display: flex; flex-direction: column; gap: 20px; }
         .controls section { background: var(--surface); padding: 16px; border-radius: 10px; display: flex; flex-direction: column; gap: 10px; }
         .controls h3 { margin: 0 0 4px; font-size: 13px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; }
         .controls label { display: flex; flex-direction: column; font-size: 12px; color: var(--text-tertiary); gap: 4px; }
         .controls label.cb { flex-direction: row; align-items: center; gap: 6px; color: var(--text-secondary); }
-        .controls input[type=text], .controls input[type=number], .controls input:not([type]), .controls select {
+        .controls input[type=text], .controls input[type=number], .controls input[type=search], .controls input:not([type]), .controls select {
           background: var(--surface-elevated); color: var(--text-primary); border: 1px solid var(--surface); padding: 8px 10px; border-radius: 6px; font: inherit; font-size: 13px;
         }
         .controls button { background: var(--primary); color: #000; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font: inherit; font-size: 13px; }
         .controls button.ghost { background: transparent; color: var(--text-secondary); border: 1px solid var(--surface-elevated); }
         .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 
-        .chips { display: flex; flex-wrap: wrap; gap: 6px; }
-        .chip { display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; border-radius: 4px; background: var(--surface-elevated); cursor: pointer; font-size: 12px; color: var(--text-secondary); }
+        .cat-chips { display: flex; flex-direction: column; gap: 8px; }
+        .cat-group .cat-label { font-size: 10px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+        .chips { display: flex; flex-wrap: wrap; gap: 4px; }
+        .chip { display: inline-flex; align-items: center; gap: 4px; padding: 3px 7px; border-radius: 4px; background: var(--surface-elevated); cursor: pointer; font-size: 11px; color: var(--text-secondary); }
         .chip.on { background: var(--primary); color: #000; }
         .chip input { margin: 0; }
         .ckwrap { display: flex; flex-direction: column; gap: 6px; }
         .seg-label { font-size: 11px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; }
 
-        .pal { display: flex; flex-direction: column; gap: 4px; max-height: 360px; overflow-y: auto; }
+        .estyle { display: flex; flex-direction: column; gap: 4px; }
+        .estyle-row { display: grid; grid-template-columns: 1fr 50px 1fr; gap: 6px; align-items: center; }
+        .estyle-id { font-size: 11px; color: var(--text-secondary); padding: 4px 6px; }
+        .estyle-icon { text-align: center; font-family: var(--font-mono); }
+        .estyle-color { font-size: 11px; }
+
+        .pal { display: flex; flex-direction: column; gap: 4px; max-height: 320px; overflow-y: auto; }
         .pal-row { display: grid; grid-template-columns: 36px 1fr 100px; align-items: center; gap: 8px; }
         .pal-row input[type=color] { width: 36px; height: 28px; padding: 0; border: 1px solid var(--surface-elevated); border-radius: 4px; }
         .pal-key { font-size: 11px; color: var(--text-secondary); }
@@ -339,6 +500,19 @@ export default function Builder({ seedThemes, fontFamilies = [] }: BuilderProps)
         .actions button.primary { background: var(--primary); color: #000; border-color: transparent; }
         .actions button:hover { border-color: var(--primary); }
         .hint { font-size: 12px; color: var(--text-tertiary); margin-top: 12px; max-width: 560px; }
+
+        .glyphs { margin-top: 32px; background: var(--surface); padding: 16px; border-radius: 10px; }
+        .glyphs h3 { margin: 0 0 4px; font-size: 14px; color: var(--text-primary); }
+        .gfilter { width: 100%; max-width: 320px; margin: 8px 0 12px; background: var(--surface-elevated); border: 1px solid var(--surface); color: var(--text-primary); padding: 6px 10px; border-radius: 6px; font-size: 13px; }
+        .glyph-grid { display: grid; gap: 16px; }
+        .ggroup-label { font-size: 11px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+        .grow { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 6px; }
+        .gbtn { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 6px; background: var(--surface-elevated); border: 1px solid transparent; border-radius: 6px; cursor: pointer; color: var(--text-primary); }
+        .gbtn:hover { border-color: var(--primary); }
+        .gbtn.flash { background: var(--primary); color: #000; }
+        .gbtn .ch { font-size: 22px; line-height: 1; }
+        .gbtn .nm { font-size: 10px; color: var(--text-tertiary); }
+        .gbtn.flash .nm { color: rgba(0,0,0,0.6); }
 
         @media (max-width: 900px) {
           .grid { grid-template-columns: 1fr; }

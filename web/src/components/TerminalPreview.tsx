@@ -1,4 +1,5 @@
-import type { Theme, HorizontalBar, VerticalBar } from '../lib/themes';
+import type { Theme, HorizontalBar, VerticalBar, ElementStyle } from '../lib/themes';
+import { ELEMENT_BY_ID } from '../lib/elements';
 
 export interface TerminalPreviewProps {
   theme: Theme;
@@ -19,26 +20,11 @@ const SEP_CHAR: Record<NonNullable<Theme['prompt']['separator']>, string> = {
   none: '',
 };
 
-const SEGMENT_LABEL: Record<string, string> = {
-  cwd: '~/code/aish',
-  'git-status': ' main',
-  'ai-tier': 'AI:local',
-  'drachma-balance': '◈ 42',
-  'exit-code': '✓ 0',
-  duration: '1.2s',
-  'k8s-context': '⎈ dev',
-  user: 'itsfwcp',
-  host: 'kepler',
-  venv: '(env)',
-  session: '#session',
-  time: '14:32',
-  weather: ' 72°F',
-  battery: ' 87%',
-  'ai-suggestion': 'AI tip',
-};
-
-function elementLabel(id: string): string {
-  return SEGMENT_LABEL[id] ?? id;
+function elementLabel(id: string, override?: ElementStyle): string {
+  const spec = ELEMENT_BY_ID[id];
+  const icon = override?.icon !== undefined ? override.icon : (spec?.icon ?? '');
+  const sample = spec?.sample ?? id;
+  return icon ? `${icon} ${sample}`.trim() : sample;
 }
 
 export default function TerminalPreview({ theme, rows, className }: TerminalPreviewProps) {
@@ -59,6 +45,8 @@ export default function TerminalPreview({ theme, rows, className }: TerminalPrev
   const accentKeys = ['blue', 'green', 'red', 'yellow', 'cyan', 'purple', 'pink', 'orange'].filter((k) => palette[k]);
   const accentFor = (i: number) => palette[accentKeys[i % accentKeys.length]] ?? muted;
 
+  const stripGlyphs = (s: string): string => s.replace(/[-\u{f0000}-\u{ffffd}]/gu, '').trim();
+
   const renderPromptLine = (input?: string) => {
     if (separator === 'powerline' && segments.length > 0) {
       return (
@@ -66,7 +54,8 @@ export default function TerminalPreview({ theme, rows, className }: TerminalPrev
           {segments.map((seg, i) => {
             const segBg = accentFor(i);
             const next = i < segments.length - 1 ? accentFor(i + 1) : null;
-            const label = useGlyphs ? elementLabel(seg) : (elementLabel(seg)?.replace(/[-☀-➿◈✓⎈]/g, '').trim() || seg);
+            const raw = elementLabel(seg);
+            const label = useGlyphs ? raw : (stripGlyphs(raw) || seg);
             return (
               <span key={i} className="seg" style={{ background: segBg, color: '#000' }}>
                 <span style={{ padding: '0 8px' }}>{label}</span>
@@ -125,15 +114,20 @@ export default function TerminalPreview({ theme, rows, className }: TerminalPrev
 
   // Compass bars
   const layout = theme.layout ?? {};
+  const renderElement = (e: string, elements?: Record<string, ElementStyle>) => {
+    const override = elements?.[e];
+    const color = resolve(override?.color, palette);
+    return <span key={e} className="elem" style={color ? { color } : undefined}>{elementLabel(e, override)}</span>;
+  };
   const renderHBar = (bar: HorizontalBar | undefined) => {
     if (!bar?.enabled) return null;
     const bg = resolve(bar.background, palette) ?? 'rgba(255,255,255,0.06)';
     const fg = resolve(bar.foreground, palette) ?? muted;
     return (
       <div className="hbar" style={{ background: bg, color: fg }}>
-        <div className="hbar-l">{(bar.left ?? []).map((e) => <span key={e} className="elem">{elementLabel(e)}</span>)}</div>
-        <div className="hbar-c">{(bar.center ?? []).map((e) => <span key={e} className="elem">{elementLabel(e)}</span>)}</div>
-        <div className="hbar-r">{(bar.right ?? []).map((e) => <span key={e} className="elem">{elementLabel(e)}</span>)}</div>
+        <div className="hbar-l">{(bar.left ?? []).map((e) => renderElement(e, bar.elements))}</div>
+        <div className="hbar-c">{(bar.center ?? []).map((e) => renderElement(e, bar.elements))}</div>
+        <div className="hbar-r">{(bar.right ?? []).map((e) => renderElement(e, bar.elements))}</div>
       </div>
     );
   };
@@ -143,11 +137,16 @@ export default function TerminalPreview({ theme, rows, className }: TerminalPrev
     const bg = resolve(bar.background, palette) ?? 'rgba(255,255,255,0.06)';
     const fg = resolve(bar.foreground, palette) ?? muted;
     const width = bar.width ?? 16;
+    const renderV = (e: string) => {
+      const override = bar.elements?.[e];
+      const color = resolve(override?.color, palette);
+      return <div key={e} className="velem" style={color ? { color } : undefined}>{elementLabel(e, override)}</div>;
+    };
     return (
       <div className="vbar" style={{ background: bg, color: fg, width: `${width * 0.6}em` }}>
-        <div className="vbar-t">{(bar.top ?? []).map((e) => <div key={e} className="velem">{elementLabel(e)}</div>)}</div>
-        <div className="vbar-c">{(bar.center ?? []).map((e) => <div key={e} className="velem">{elementLabel(e)}</div>)}</div>
-        <div className="vbar-b">{(bar.bottom ?? []).map((e) => <div key={e} className="velem">{elementLabel(e)}</div>)}</div>
+        <div className="vbar-t">{(bar.top ?? []).map(renderV)}</div>
+        <div className="vbar-c">{(bar.center ?? []).map(renderV)}</div>
+        <div className="vbar-b">{(bar.bottom ?? []).map(renderV)}</div>
       </div>
     );
   };
