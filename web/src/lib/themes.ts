@@ -32,6 +32,13 @@ export interface FontSpec {
   nerd_font?: boolean;
 }
 
+export interface ElementStyle {
+  icon?: string;
+  color?: string;
+}
+
+export type ElementsMap = Record<string, ElementStyle>;
+
 export interface HorizontalBar {
   enabled?: boolean;
   background?: string;
@@ -39,6 +46,7 @@ export interface HorizontalBar {
   left?: string[];
   center?: string[];
   right?: string[];
+  elements?: ElementsMap;
 }
 
 export interface VerticalBar {
@@ -49,6 +57,7 @@ export interface VerticalBar {
   top?: string[];
   center?: string[];
   bottom?: string[];
+  elements?: ElementsMap;
 }
 
 export interface LayoutSpec {
