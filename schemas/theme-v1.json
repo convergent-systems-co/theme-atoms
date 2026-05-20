@@ -70,26 +70,9 @@
         },
         "segments": {
           "type": "array",
-          "items": {
-            "type": "string",
-            "enum": [
-              "cwd",
-              "git-status",
-              "ai-tier",
-              "drachma-balance",
-              "exit-code",
-              "duration",
-              "k8s-context",
-              "user",
-              "host",
-              "venv",
-              "weather",
-              "time",
-              "battery"
-            ]
-          },
+          "items": { "$ref": "#/$defs/elementId" },
           "uniqueItems": true,
-          "description": "Ordered list of segments to render. Unknown segments MUST be rejected by the consumer. Consumers fetch live data for dynamic segments (weather, time, battery); see docs/elements.md for the data contract."
+          "description": "Ordered list of segments to render. Unknown segments MUST be rejected by the consumer. See docs/elements.md for the data contract."
         },
         "separator": {
           "type": "string",
@@ -176,11 +159,46 @@
       "pattern": "^(?:#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})|\\{palette\\.[a-zA-Z0-9_-]+\\})$",
       "description": "Either a hex color (#RGB / #RRGGBB / #RRGGBBAA) or a palette reference {palette.NAME} that MUST resolve within this theme's own palette block. No external references."
     },
-    "barElement": {
+    "elementId": {
       "type": "string",
       "minLength": 1,
       "maxLength": 64,
-      "description": "Element ID. Consumers map this to a renderer (cwd, git-status, ai-tier, time, etc.). Unknown elements MAY be skipped silently."
+      "enum": [
+        "cwd", "path", "git-status", "git-ahead-behind", "git-stash-count", "hg-status", "jj-status",
+        "user", "host", "hostname-icon", "venv", "shell-level",
+        "exit-code", "duration", "cmd-duration-while-running", "cmd-status", "bg-jobs",
+        "time", "date", "uptime", "battery", "volume", "mute-status", "keyboard-layout",
+        "weather",
+        "ai-tier", "ai-suggestion", "drachma-balance", "session", "agent-model",
+        "k8s-context", "docker-context", "terraform-workspace", "aws-profile", "gcp-project", "azure-subscription",
+        "nix-shell", "direnv-status",
+        "node-version", "python-version", "go-version", "rust-version", "ruby-version", "java-version",
+        "load-avg", "cpu-usage", "mem-usage", "disk-usage",
+        "network-status", "vpn-status",
+        "os-icon", "prompt-newline"
+      ],
+      "description": "Element ID. Consumers map this to a renderer (data + glyph). Unknown elements MAY be skipped silently. See docs/elements.md for the full catalog and data contracts."
+    },
+    "elementStyle": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Per-element style override. Both fields optional; absent means 'use consumer default'.",
+      "properties": {
+        "icon": {
+          "type": "string",
+          "maxLength": 12,
+          "description": "Glyph (or short string) to render in place of the element's default icon. Empty string disables the icon."
+        },
+        "color": {
+          "$ref": "#/$defs/colorRef",
+          "description": "Text color override for this element (otherwise the bar's foreground applies)."
+        }
+      }
+    },
+    "elementsMap": {
+      "type": "object",
+      "description": "Per-element style overrides keyed by element id. Lets a theme decide each element's icon + text color independently of the bar's bg/fg.",
+      "additionalProperties": { "$ref": "#/$defs/elementStyle" }
     },
     "horizontalBar": {
       "type": "object",
@@ -190,9 +208,10 @@
         "enabled": { "type": "boolean", "default": false },
         "background": { "$ref": "#/$defs/colorRef" },
         "foreground": { "$ref": "#/$defs/colorRef" },
-        "left":   { "type": "array", "items": { "$ref": "#/$defs/barElement" } },
-        "center": { "type": "array", "items": { "$ref": "#/$defs/barElement" } },
-        "right":  { "type": "array", "items": { "$ref": "#/$defs/barElement" } }
+        "left":   { "type": "array", "items": { "$ref": "#/$defs/elementId" } },
+        "center": { "type": "array", "items": { "$ref": "#/$defs/elementId" } },
+        "right":  { "type": "array", "items": { "$ref": "#/$defs/elementId" } },
+        "elements": { "$ref": "#/$defs/elementsMap" }
       }
     },
     "verticalBar": {
@@ -204,9 +223,10 @@
         "background": { "$ref": "#/$defs/colorRef" },
         "foreground": { "$ref": "#/$defs/colorRef" },
         "width":  { "type": "integer", "minimum": 4, "maximum": 80, "description": "Column width (in monospace cells)." },
-        "top":    { "type": "array", "items": { "$ref": "#/$defs/barElement" } },
-        "center": { "type": "array", "items": { "$ref": "#/$defs/barElement" } },
-        "bottom": { "type": "array", "items": { "$ref": "#/$defs/barElement" } }
+        "top":    { "type": "array", "items": { "$ref": "#/$defs/elementId" } },
+        "center": { "type": "array", "items": { "$ref": "#/$defs/elementId" } },
+        "bottom": { "type": "array", "items": { "$ref": "#/$defs/elementId" } },
+        "elements": { "$ref": "#/$defs/elementsMap" }
       }
     }
   }
