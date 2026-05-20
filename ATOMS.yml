@@ -1,0 +1,38 @@
+# ATOMS.yml — catalog manifest for theme-atoms
+#
+# See https://github.com/convergent-systems-co/atoms-spec for the canonical schema this conforms to.
+
+name: theme-atoms
+version: 0.1.0
+spec: atoms-spec/v1
+domain: theme-atoms.com
+ecosystem:
+  federation: xdao.co
+  redirect: theme.xdao.co
+
+purpose: |
+  Theme primitives for terminal, shell, editor, and TUI experiences — prompt segments, separators, glyph sets, role bindings, syntax schemes. Composable surface designs that extend brands with surface-specific behavior.
+
+atomTypes:
+  - prompt-segment
+  - separator-style
+  - glyph-set
+  - role-binding
+  - syntax-scheme
+
+compositionType: themes
+compositionDir: themes
+
+ruleTypes:
+  - brand-conformance
+  - contrast-requirement
+  - glyph-completeness
+
+runtimeConsumers:
+  - aish
+  - olympus
+
+license: Apache-2.0
+maintainers:
+  - name: Convergent Systems
+    contact: maintainers@xdao.co
