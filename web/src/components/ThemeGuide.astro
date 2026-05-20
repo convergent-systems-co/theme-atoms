@@ -59,6 +59,21 @@ const paletteEntries = Object.entries(theme.palette);
     ))}
   </div>
 
+  {theme.font && (
+    <>
+      <h2>Font</h2>
+      <ul class="kv">
+        <li><span>family</span><code>{theme.font.family}</code></li>
+        {theme.font.fallback && <li><span>fallback</span><code>{theme.font.fallback.join(' → ')}</code></li>}
+        {theme.font.size != null && <li><span>size</span><code>{theme.font.size}pt</code></li>}
+        {theme.font.weight != null && <li><span>weight</span><code>{theme.font.weight}</code></li>}
+        {theme.font.ligatures != null && <li><span>ligatures</span><code>{String(theme.font.ligatures)}</code></li>}
+        {theme.font.nerd_font != null && <li><span>nerd_font</span><code>{String(theme.font.nerd_font)}</code></li>}
+      </ul>
+      <p class="font-hint">Strong preference. aish-term / TUI consumers SHOULD match; CLI consumers MAY ignore. User can override locally.</p>
+    </>
+  )}
+
   <h2>Prompt</h2>
   <ul class="kv">
     <li><span>character</span><code>{theme.prompt.character}</code></li>
@@ -67,6 +82,40 @@ const paletteEntries = Object.entries(theme.palette);
     <li><span>separator</span><code>{theme.prompt.separator ?? 'none'}</code></li>
     <li><span>glyphs</span><code>{theme.prompt.glyphs ?? 'ascii'}</code></li>
   </ul>
+
+  {theme.layout && (Object.values(theme.layout).some((b) => b?.enabled)) && (
+    <>
+      <h2>Layout</h2>
+      <p class="muted">Compass bars surround the always-rendered middle (interactive terminal).</p>
+      <div class="compass">
+        {(['north', 'south'] as const).map((dir) => {
+          const bar = theme.layout?.[dir];
+          if (!bar?.enabled) return null;
+          return (
+            <div class="cbar h">
+              <span class="cdir">{dir}</span>
+              <span class="cbucket"><span class="bk">left</span>{(bar.left ?? []).map((e) => <code>{e}</code>)}</span>
+              <span class="cbucket"><span class="bk">center</span>{(bar.center ?? []).map((e) => <code>{e}</code>)}</span>
+              <span class="cbucket"><span class="bk">right</span>{(bar.right ?? []).map((e) => <code>{e}</code>)}</span>
+            </div>
+          );
+        })}
+        {(['east', 'west'] as const).map((dir) => {
+          const bar = theme.layout?.[dir];
+          if (!bar?.enabled) return null;
+          return (
+            <div class="cbar v">
+              <span class="cdir">{dir}</span>
+              <span class="cmeta">width={bar.width ?? '-'}</span>
+              <span class="cbucket"><span class="bk">top</span>{(bar.top ?? []).map((e) => <code>{e}</code>)}</span>
+              <span class="cbucket"><span class="bk">center</span>{(bar.center ?? []).map((e) => <code>{e}</code>)}</span>
+              <span class="cbucket"><span class="bk">bottom</span>{(bar.bottom ?? []).map((e) => <code>{e}</code>)}</span>
+            </div>
+          );
+        })}
+      </div>
+    </>
+  )}
 
   {theme.roles && Object.keys(theme.roles).length > 0 && (
     <>
@@ -144,4 +193,13 @@ const paletteEntries = Object.entries(theme.palette);
   ul.kv li { display: grid; grid-template-columns: 200px 1fr; align-items: center; padding: 6px 10px; background: var(--surface); border-radius: 6px; font-size: 13px; }
   ul.kv li span { color: var(--text-tertiary); }
   .role-val { display: flex; align-items: center; }
+  .font-hint { font-size: 12px; color: var(--text-tertiary); margin: -16px 0 24px; }
+  .muted { color: var(--text-tertiary); }
+  .compass { display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; }
+  .cbar { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; padding: 10px 12px; background: var(--surface); border-radius: 6px; font-size: 12px; }
+  .cdir { display: inline-block; min-width: 60px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; }
+  .cmeta { color: var(--text-tertiary); }
+  .cbucket { display: inline-flex; align-items: center; gap: 6px; }
+  .bk { font-size: 10px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; }
+  .cbucket code { padding: 2px 6px; }
 </style>
