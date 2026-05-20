@@ -23,6 +23,41 @@ export interface PromptSpec {
   glyphs?: 'nerd-default' | 'ascii' | 'minimal';
 }
 
+export interface FontSpec {
+  family: string;
+  fallback?: string[];
+  size?: number;
+  weight?: 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900;
+  ligatures?: boolean;
+  nerd_font?: boolean;
+}
+
+export interface HorizontalBar {
+  enabled?: boolean;
+  background?: string;
+  foreground?: string;
+  left?: string[];
+  center?: string[];
+  right?: string[];
+}
+
+export interface VerticalBar {
+  enabled?: boolean;
+  background?: string;
+  foreground?: string;
+  width?: number;
+  top?: string[];
+  center?: string[];
+  bottom?: string[];
+}
+
+export interface LayoutSpec {
+  north?: HorizontalBar;
+  south?: HorizontalBar;
+  east?: VerticalBar;
+  west?: VerticalBar;
+}
+
 export interface Theme {
   schema: string;
   meta: ThemeMeta;
@@ -30,6 +65,8 @@ export interface Theme {
   prompt: PromptSpec;
   roles?: Record<string, string>;
   syntax?: Record<string, string>;
+  font?: FontSpec;
+  layout?: LayoutSpec;
 }
 
 let cache: Theme[] | null = null;

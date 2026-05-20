@@ -114,6 +114,57 @@
         "$ref": "#/$defs/colorRef"
       },
       "description": "Syntax-highlighting token → color mappings. Optional; consumers fall back to roles or defaults."
+    },
+    "font": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Preferred font for rendering this theme. A strong preference: aish-term / TUI consumers SHOULD match this font when available; plain CLI consumers MAY ignore. Users always retain a local override.",
+      "properties": {
+        "family": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Primary font family. Should be a monospace font for prompt + segments to line up."
+        },
+        "fallback": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true,
+          "description": "Ordered fallback chain. Consumer walks this list when the primary family is unavailable."
+        },
+        "size": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 96,
+          "description": "Point size (pt) hint. Consumer may scale."
+        },
+        "weight": {
+          "type": "integer",
+          "enum": [100, 200, 300, 400, 500, 600, 700, 800, 900],
+          "default": 400
+        },
+        "ligatures": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable programming ligatures (=> != etc). Requires a font that ships them."
+        },
+        "nerd_font": {
+          "type": "boolean",
+          "default": false,
+          "description": "Asserts the primary family is a Nerd Font patch. Required to be true when prompt.glyphs == 'nerd-default'."
+        }
+      },
+      "required": ["family"]
+    },
+    "layout": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Compass layout: north (top), south (bottom), east (right), west (left) bars surround the always-present middle (the interactive terminal). Each bar holds named elements packed by alignment. Consumers render the bars they can; the middle is always rendered.",
+      "properties": {
+        "north": { "$ref": "#/$defs/horizontalBar" },
+        "south": { "$ref": "#/$defs/horizontalBar" },
+        "east":  { "$ref": "#/$defs/verticalBar" },
+        "west":  { "$ref": "#/$defs/verticalBar" }
+      }
     }
   },
   "$defs": {
@@ -121,6 +172,39 @@
       "type": "string",
       "pattern": "^(?:#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})|\\{palette\\.[a-zA-Z0-9_-]+\\})$",
       "description": "Either a hex color (#RGB / #RRGGBB / #RRGGBBAA) or a palette reference {palette.NAME} that MUST resolve within this theme's own palette block. No external references."
+    },
+    "barElement": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "description": "Element ID. Consumers map this to a renderer (cwd, git-status, ai-tier, time, etc.). Unknown elements MAY be skipped silently."
+    },
+    "horizontalBar": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "A north or south bar. Elements pack into three alignment buckets.",
+      "properties": {
+        "enabled": { "type": "boolean", "default": false },
+        "background": { "$ref": "#/$defs/colorRef" },
+        "foreground": { "$ref": "#/$defs/colorRef" },
+        "left":   { "type": "array", "items": { "$ref": "#/$defs/barElement" } },
+        "center": { "type": "array", "items": { "$ref": "#/$defs/barElement" } },
+        "right":  { "type": "array", "items": { "$ref": "#/$defs/barElement" } }
+      }
+    },
+    "verticalBar": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "An east or west bar. Renders as a vertical panel of given width. Elements pack into three alignment buckets.",
+      "properties": {
+        "enabled": { "type": "boolean", "default": false },
+        "background": { "$ref": "#/$defs/colorRef" },
+        "foreground": { "$ref": "#/$defs/colorRef" },
+        "width":  { "type": "integer", "minimum": 4, "maximum": 80, "description": "Column width (in monospace cells)." },
+        "top":    { "type": "array", "items": { "$ref": "#/$defs/barElement" } },
+        "center": { "type": "array", "items": { "$ref": "#/$defs/barElement" } },
+        "bottom": { "type": "array", "items": { "$ref": "#/$defs/barElement" } }
+      }
     }
   }
 }
