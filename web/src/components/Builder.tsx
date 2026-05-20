@@ -4,6 +4,7 @@ import TerminalPreview from './TerminalPreview';
 
 export interface BuilderProps {
   seedThemes: Theme[];
+  fontFamilies?: string[];
 }
 
 const SEGMENTS = ['cwd', 'git-status', 'ai-tier', 'drachma-balance', 'exit-code', 'duration', 'k8s-context', 'user', 'host', 'venv'];
@@ -103,7 +104,7 @@ function ChipToggleList({ value, options, onChange }: { value: string[]; options
   );
 }
 
-export default function Builder({ seedThemes }: BuilderProps) {
+export default function Builder({ seedThemes, fontFamilies = [] }: BuilderProps) {
   const [seedId, setSeedId] = useState(seedThemes[0]?.meta.id ?? 'default');
   const seed = useMemo(() => seedThemes.find((t) => t.meta.id === seedId) ?? seedThemes[0], [seedThemes, seedId]);
 
@@ -213,7 +214,12 @@ export default function Builder({ seedThemes }: BuilderProps) {
 
           <section>
             <h3>Font</h3>
-            <label>Family<input value={fontFamily} onChange={(e) => setFontFamily(e.target.value)} placeholder="e.g. JetBrains Mono" /></label>
+            <label>Family
+              <input value={fontFamily} onChange={(e) => setFontFamily(e.target.value)} placeholder="e.g. JetBrainsMono Nerd Font" list="font-families" />
+            </label>
+            <datalist id="font-families">
+              {fontFamilies.map((f) => <option key={f} value={f} />)}
+            </datalist>
             <div className="row2">
               <label>Size<input type="number" min={6} max={48} value={fontSize ?? ''} onChange={(e) => setFontSize(e.target.value ? Number(e.target.value) : undefined)} /></label>
               <label>Weight

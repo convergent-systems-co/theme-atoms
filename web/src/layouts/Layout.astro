@@ -2,7 +2,7 @@
 export interface Props {
   title: string;
   description?: string;
-  section?: 'home' | 'themes' | 'builder' | 'install' | 'how-to-use' | 'request';
+  section?: 'home' | 'themes' | 'fonts' | 'builder' | 'install' | 'how-to-use' | 'request';
 }
 
 const { title, description = 'Self-contained terminal themes for aish and other shells. Composable, versioned, served fresh from theme-atoms.com.', section = 'home' } = Astro.props;
@@ -10,6 +10,7 @@ const { title, description = 'Self-contained terminal themes for aish and other 
 const navItems = [
   { id: 'home', label: 'Home', href: '/' },
   { id: 'themes', label: 'Themes', href: '/themes' },
+  { id: 'fonts', label: 'Fonts', href: '/fonts' },
   { id: 'builder', label: 'Builder', href: '/builder' },
   { id: 'install', label: 'Install', href: '/install' },
   { id: 'how-to-use', label: 'How to use', href: '/how-to-use' },
