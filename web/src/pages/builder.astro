@@ -1,0 +1,19 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Builder from '../components/Builder';
+import { loadThemes } from '../lib/themes';
+
+const themes = loadThemes();
+---
+<Layout title="Builder — Theme Atoms" section="builder">
+  <header>
+    <p class="kicker">Builder</p>
+    <h1>Build a theme</h1>
+    <p class="lead">Start from a seed, tune the palette + prompt + separators + glyphs, watch the terminal preview live. Export TOML, download, or propose to the catalog directly.</p>
+  </header>
+  <Builder seedThemes={themes} client:only="react" />
+  <style>
+    .kicker { color: var(--text-tertiary); font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; margin: 0 0 4px; }
+    .lead { color: var(--text-secondary); max-width: 640px; margin-bottom: 24px; }
+  </style>
+</Layout>
