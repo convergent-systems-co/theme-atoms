@@ -82,11 +82,14 @@
               "k8s-context",
               "user",
               "host",
-              "venv"
+              "venv",
+              "weather",
+              "time",
+              "battery"
             ]
           },
           "uniqueItems": true,
-          "description": "Ordered list of segments to render. Unknown segments MUST be rejected by the consumer."
+          "description": "Ordered list of segments to render. Unknown segments MUST be rejected by the consumer. Consumers fetch live data for dynamic segments (weather, time, battery); see docs/elements.md for the data contract."
         },
         "separator": {
           "type": "string",

@@ -2,9 +2,9 @@ schema = "https://theme-atoms.com/schemas/theme-v1.json"
 
 [meta]
 id = "nord-powerline"
-version = "1.1.0"
+version = "1.2.0"
 display_name = "Nord — Powerline"
-description = "Nord palette with powerline separators and Nerd Font glyphs. North + south status bars, JetBrainsMono Nerd Font preferred."
+description = "Nord palette with powerline separators and Nerd Font glyphs. North + south status bars (north includes weather), JetBrainsMono Nerd Font preferred."
 extends_brand = "nord"
 
 [font]
@@ -76,7 +76,7 @@ background = "{palette.nord1}"
 foreground = "{palette.fg}"
 left = ["session", "host"]
 center = []
-right = ["time", "ai-tier"]
+right = ["weather", "time", "ai-tier"]
 
 [layout.south]
 enabled = true
