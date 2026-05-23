@@ -111,7 +111,7 @@ import {
 
 import {
   to = cloudflare_pages_domain.custom
-  id = "e1fe0f0ce8ff18da4edc118372c30022/theme-atoms/68bc303a-245d-4ac8-8c82-3b80289a1e8d"
+  id = "e1fe0f0ce8ff18da4edc118372c30022/theme-atoms/theme-atoms.com"
 }
 
 import {
