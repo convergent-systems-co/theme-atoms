@@ -13,7 +13,7 @@ const { theme } = Astro.props;
 const repoRoot = resolve(process.cwd(), '..');
 const tomlSource = readFileSync(join(repoRoot, 'themes', `${theme.meta.id}.toml`), 'utf-8');
 ---
-<Layout title={`${theme.meta.display_name} — Theme Atoms`} description={theme.meta.description} section="themes">
+<Layout title={`${theme.meta.display_name} — THEME-Atoms`} description={theme.meta.description} section="themes">
   <p class="back"><a href="/themes">← All themes</a></p>
   <ThemeGuide theme={theme} tomlSource={tomlSource} />
   <style>
