@@ -1,0 +1,70 @@
+schema = "https://theme-atoms.com/schemas/theme-v1.json"
+
+[meta]
+id = "olympus-default"
+version = "1.0.0"
+display_name = "Olympus Default"
+description = "Native Olympus system theme. Deep blue-grey palette with the Olympus ❯ prompt character. Designed for aish and Olympus governance panels."
+
+[font]
+family = "JetBrainsMono Nerd Font"
+fallback = ["JetBrains Mono", "Fira Code", "Menlo", "monospace"]
+size = 13
+weight = 400
+ligatures = true
+nerd_font = true
+
+[palette]
+fg = "#e2e8f0"
+bg = "#0f172a"
+surface = "#1e293b"
+border = "#334155"
+muted = "#64748b"
+blue = "#3b82f6"
+indigo = "#6366f1"
+cyan = "#22d3ee"
+green = "#4ade80"
+yellow = "#facc15"
+orange = "#fb923c"
+red = "#f87171"
+purple = "#a78bfa"
+gold = "#fbbf24"
+
+[prompt]
+character = "❯"
+character_color = "{palette.indigo}"
+segments = ["cwd", "git-status", "ai-tier", "drachma-balance", "session", "exit-code"]
+separator = "none"
+glyphs = "nerd-default"
+
+[roles]
+ai_tier_local = "{palette.green}"
+ai_tier_cloud = "{palette.cyan}"
+drachma_low = "{palette.red}"
+drachma_ok = "{palette.muted}"
+exit_ok = "{palette.muted}"
+exit_err = "{palette.red}"
+
+[syntax]
+keyword = "{palette.indigo}"
+string = "{palette.green}"
+number = "{palette.gold}"
+function = "{palette.cyan}"
+type = "{palette.blue}"
+comment = "{palette.muted}"
+
+[layout.north]
+enabled = true
+background = "{palette.surface}"
+foreground = "{palette.fg}"
+left = ["session", "agent-model", "host"]
+center = []
+right = ["ai-tier", "drachma-balance", "time"]
+
+[layout.south]
+enabled = true
+background = "{palette.surface}"
+foreground = "{palette.muted}"
+left = ["cwd", "git-status", "terraform-workspace"]
+center = []
+right = ["exit-code", "duration", "bg-jobs"]

@@ -1,8 +1,41 @@
 {
   "catalog": "theme-atoms",
   "version": "0.1.0",
-  "built_at": "2026-05-26T15:49:45+00:00",
-  "atoms": [],
+  "built_at": "2026-05-26T16:07:07+00:00",
+  "atoms": [
+    {
+      "schema": "https://theme-atoms.com/schemas/atom-v1.json",
+      "type": "separator-style",
+      "id": "theme-atoms/separator-style/arrow",
+      "version": "1.0.0",
+      "name": "Unicode Arrow",
+      "description": "Unicode right-angle quotation mark as a minimal, font-agnostic segment separator.",
+      "surface": "shell",
+      "content": "›",
+      "tags": [
+        "arrow",
+        "minimal",
+        "unicode",
+        "shell"
+      ]
+    },
+    {
+      "schema": "https://theme-atoms.com/schemas/atom-v1.json",
+      "type": "separator-style",
+      "id": "theme-atoms/separator-style/powerline",
+      "version": "1.0.0",
+      "name": "Powerline Arrow",
+      "description": "Filled Powerline arrow separator. Requires a Nerd Font or Powerline-patched font.",
+      "surface": "shell",
+      "content": "",
+      "tags": [
+        "powerline",
+        "arrow",
+        "nerd-font",
+        "shell"
+      ]
+    }
+  ],
   "compositions": [
     {
       "schema_version": "1",
@@ -27,6 +60,18 @@
           "url": "https://theme-atoms.com/themes/dracula.toml"
         },
         {
+          "id": "dracula-minimal",
+          "version": "1.0.0",
+          "display_name": "Dracula Minimal",
+          "url": "https://theme-atoms.com/themes/dracula-minimal.toml"
+        },
+        {
+          "id": "gruvbox-classic",
+          "version": "1.0.0",
+          "display_name": "Gruvbox Classic",
+          "url": "https://theme-atoms.com/themes/gruvbox-classic.toml"
+        },
+        {
           "id": "gruvbox-dark",
           "version": "1.0.0",
           "display_name": "Gruvbox Dark",
@@ -39,10 +84,22 @@
           "url": "https://theme-atoms.com/themes/monokai.toml"
         },
         {
+          "id": "monokai-powerline",
+          "version": "1.0.0",
+          "display_name": "Monokai Powerline",
+          "url": "https://theme-atoms.com/themes/monokai-powerline.toml"
+        },
+        {
           "id": "nord-powerline",
           "version": "1.2.0",
           "display_name": "Nord — Powerline",
           "url": "https://theme-atoms.com/themes/nord-powerline.toml"
+        },
+        {
+          "id": "olympus-default",
+          "version": "1.0.0",
+          "display_name": "Olympus Default",
+          "url": "https://theme-atoms.com/themes/olympus-default.toml"
         },
         {
           "id": "solarized-dark",

@@ -1,0 +1,67 @@
+schema = "https://theme-atoms.com/schemas/theme-v1.json"
+
+[meta]
+id = "monokai-powerline"
+version = "1.0.0"
+display_name = "Monokai Powerline"
+description = "Classic Monokai palette with Powerline separators and Nerd Font glyphs. Vivid accent colors on a warm dark background."
+extends_brand = "monokai"
+
+[font]
+family = "JetBrainsMono Nerd Font"
+fallback = ["JetBrains Mono", "Fira Code", "Menlo", "monospace"]
+size = 13
+weight = 400
+ligatures = true
+nerd_font = true
+
+[palette]
+fg = "#f8f8f2"
+bg = "#272822"
+pink = "#f92672"
+orange = "#fd971f"
+yellow = "#e6db74"
+green = "#a6e22e"
+blue = "#66d9ef"
+purple = "#ae81ff"
+muted = "#75715e"
+surface = "#3e3d32"
+
+[prompt]
+character = "❯"
+character_color = "{palette.pink}"
+segments = ["cwd", "git-status", "ai-tier", "drachma-balance", "exit-code"]
+separator = "powerline"
+glyphs = "nerd-default"
+
+[roles]
+ai_tier_local = "{palette.green}"
+ai_tier_cloud = "{palette.blue}"
+drachma_low = "{palette.pink}"
+drachma_ok = "{palette.muted}"
+exit_ok = "{palette.muted}"
+exit_err = "{palette.pink}"
+
+[syntax]
+keyword = "{palette.pink}"
+string = "{palette.yellow}"
+number = "{palette.purple}"
+function = "{palette.green}"
+type = "{palette.blue}"
+comment = "{palette.muted}"
+
+[layout.north]
+enabled = true
+background = "{palette.surface}"
+foreground = "{palette.fg}"
+left = ["session", "host"]
+center = []
+right = ["ai-tier", "time"]
+
+[layout.south]
+enabled = true
+background = "{palette.surface}"
+foreground = "{palette.muted}"
+left = ["cwd", "git-status"]
+center = []
+right = ["exit-code", "duration"]

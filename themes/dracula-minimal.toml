@@ -1,0 +1,52 @@
+schema = "https://theme-atoms.com/schemas/theme-v1.json"
+
+[meta]
+id = "dracula-minimal"
+version = "1.0.0"
+display_name = "Dracula Minimal"
+description = "Dracula palette stripped down to a Unicode-arrow separator and no Nerd Font requirement. Clean dark purple shell prompt for any terminal."
+extends_brand = "dracula"
+
+[font]
+family = "JetBrains Mono"
+fallback = ["Fira Code", "Menlo", "monospace"]
+size = 13
+weight = 400
+ligatures = false
+nerd_font = false
+
+[palette]
+fg = "#f8f8f2"
+bg = "#282a36"
+current = "#44475a"
+muted = "#6272a4"
+cyan = "#8be9fd"
+green = "#50fa7b"
+orange = "#ffb86c"
+pink = "#ff79c6"
+purple = "#bd93f9"
+red = "#ff5555"
+yellow = "#f1fa8c"
+
+[prompt]
+character = "›"
+character_color = "{palette.pink}"
+segments = ["cwd", "git-status", "exit-code"]
+separator = "minimal"
+glyphs = "ascii"
+
+[roles]
+ai_tier_local = "{palette.green}"
+ai_tier_cloud = "{palette.cyan}"
+drachma_low = "{palette.red}"
+drachma_ok = "{palette.muted}"
+exit_ok = "{palette.muted}"
+exit_err = "{palette.red}"
+
+[syntax]
+keyword = "{palette.pink}"
+string = "{palette.yellow}"
+number = "{palette.purple}"
+function = "{palette.green}"
+type = "{palette.cyan}"
+comment = "{palette.muted}"

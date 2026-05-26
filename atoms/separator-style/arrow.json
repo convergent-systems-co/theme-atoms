@@ -1,0 +1,11 @@
+{
+  "schema": "https://theme-atoms.com/schemas/atom-v1.json",
+  "type": "separator-style",
+  "id": "theme-atoms/separator-style/arrow",
+  "version": "1.0.0",
+  "name": "Unicode Arrow",
+  "description": "Unicode right-angle quotation mark as a minimal, font-agnostic segment separator.",
+  "surface": "shell",
+  "content": "›",
+  "tags": ["arrow", "minimal", "unicode", "shell"]
+}
