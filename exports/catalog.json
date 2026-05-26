@@ -1,0 +1,63 @@
+{
+  "catalog": "theme-atoms",
+  "version": "0.1.0",
+  "built_at": "2026-05-26T15:49:45+00:00",
+  "atoms": [],
+  "compositions": [
+    {
+      "schema_version": "1",
+      "generated_at": "static",
+      "themes": [
+        {
+          "id": "catppuccin-mocha",
+          "version": "1.0.0",
+          "display_name": "Catppuccin Mocha",
+          "url": "https://theme-atoms.com/themes/catppuccin-mocha.toml"
+        },
+        {
+          "id": "default",
+          "version": "1.0.0",
+          "display_name": "Default",
+          "url": "https://theme-atoms.com/themes/default.toml"
+        },
+        {
+          "id": "dracula",
+          "version": "1.0.0",
+          "display_name": "Dracula",
+          "url": "https://theme-atoms.com/themes/dracula.toml"
+        },
+        {
+          "id": "gruvbox-dark",
+          "version": "1.0.0",
+          "display_name": "Gruvbox Dark",
+          "url": "https://theme-atoms.com/themes/gruvbox-dark.toml"
+        },
+        {
+          "id": "monokai",
+          "version": "1.0.0",
+          "display_name": "Monokai",
+          "url": "https://theme-atoms.com/themes/monokai.toml"
+        },
+        {
+          "id": "nord-powerline",
+          "version": "1.2.0",
+          "display_name": "Nord — Powerline",
+          "url": "https://theme-atoms.com/themes/nord-powerline.toml"
+        },
+        {
+          "id": "solarized-dark",
+          "version": "1.0.0",
+          "display_name": "Solarized Dark",
+          "url": "https://theme-atoms.com/themes/solarized-dark.toml"
+        },
+        {
+          "id": "tokyo-night",
+          "version": "1.0.0",
+          "display_name": "Tokyo Night",
+          "url": "https://theme-atoms.com/themes/tokyo-night.toml"
+        }
+      ]
+    }
+  ],
+  "rules": []
+}
