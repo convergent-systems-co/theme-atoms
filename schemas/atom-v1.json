@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://theme-atoms.com/schemas/atom-v1.json",
+  "title": "theme-atoms v1 atom",
+  "description": "A discrete theming primitive — a separator style, glyph set, prompt segment spec, role binding, or syntax scheme. Atoms are referenced by theme compositions but are independently versioned and typed.",
+  "type": "object",
+  "required": ["schema", "type", "id", "version", "name"],
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "type": "string",
+      "format": "uri",
+      "const": "https://theme-atoms.com/schemas/atom-v1.json",
+      "description": "Pin the schema URI so consumers can verify they understand this version."
+    },
+    "type": {
+      "type": "string",
+      "enum": ["prompt-segment", "separator-style", "glyph-set", "role-binding", "syntax-scheme"],
+      "description": "Atom type. Maps to ATOMS.yml atom_types."
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9/-]{1,}[a-z0-9]$",
+      "description": "Stable namespaced ID — e.g. theme-atoms/separator-style/powerline. Never changes after first publish."
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[A-Za-z0-9.-]+)?$",
+      "description": "Semver. Bump on any content change."
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80,
+      "description": "Human-readable display name."
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 280,
+      "description": "One-sentence description of what this atom provides."
+    },
+    "surface": {
+      "type": "string",
+      "enum": ["shell", "editor", "tui", "web", "any"],
+      "description": "Surface this atom targets. 'any' means surface-agnostic."
+    },
+    "content": {
+      "type": "string",
+      "description": "The literal primitive value — e.g. the separator character(s), the glyph string, the role map expression. Interpretation depends on 'type'."
+    },
+    "tags": {
+      "type": "array",
+      "items": {"type": "string"},
+      "uniqueItems": true,
+      "description": "Free-form tags for discovery."
+    }
+  }
+}

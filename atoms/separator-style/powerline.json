@@ -1,0 +1,11 @@
+{
+  "schema": "https://theme-atoms.com/schemas/atom-v1.json",
+  "type": "separator-style",
+  "id": "theme-atoms/separator-style/powerline",
+  "version": "1.0.0",
+  "name": "Powerline Arrow",
+  "description": "Filled Powerline arrow separator. Requires a Nerd Font or Powerline-patched font.",
+  "surface": "shell",
+  "content": "",
+  "tags": ["powerline", "arrow", "nerd-font", "shell"]
+}
