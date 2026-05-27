@@ -83,7 +83,7 @@ const fontSans = 'system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue"
         </footer>
       </main>
 
-      <aside class="sidenav">
+      <nav class="sidenav">
         <a class="brand" href="/">
           <span class="mark" aria-hidden="true">
             <span class="dot dot-1"></span>
@@ -94,20 +94,18 @@ const fontSans = 'system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue"
           <span class="brand-text">Theme<br/>Atoms</span>
         </a>
 
-        <nav class="nav">
-          <ul>
-            {navItems.map((item) => (
-              <li>
-                <a
-                  href={item.href}
-                  class:list={['nav-link', { active: item.id === section }]}
-                >
-                  {item.label}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
+        <ul class="nav">
+          {navItems.map((item) => (
+            <li>
+              <a
+                href={item.href}
+                class:list={['nav-link', { active: item.id === section }]}
+              >
+                {item.label}
+              </a>
+            </li>
+          ))}
+        </ul>
 
         <div class="aside-meta">
           <a href="https://github.com/convergent-systems-co/theme-atoms" class="meta-link">
@@ -117,7 +115,7 @@ const fontSans = 'system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue"
             <span>↗</span> aish
           </a>
         </div>
-      </aside>
+      </nav>
     </div>
 
     <style is:global define:vars={{
@@ -226,7 +224,7 @@ const fontSans = 'system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue"
       .dot-3 { background: var(--brandDot3); }
       .dot-4 { background: var(--brandDot4); }
 
-      .nav ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 4px; }
+      .nav { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 4px; }
       .nav-link {
         display: block; padding: 8px 12px; border-radius: 6px;
         color: var(--text-secondary); text-decoration: none; font-size: 14px;
